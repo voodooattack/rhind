@@ -147,12 +147,17 @@ for proof_stem in $(echo "$PREVIOUS_PROOFS" | jq -r 'keys[]' 2>/dev/null || true
 done
 
 # Build suite metadata
+# total_assertions: sum of every proof's assertion count (re-run or carried
+# forward). Read on stdin, like the proofs object below, to stay clear of
+# the argv size limit. (Before 2026-10-03 this was a literal 0.)
+TOTAL_ASSERTIONS=$(printf '%s' "$CURRENT_PROOFS_JSON" | jq '[.[].assertions // 0] | add // 0')
 SUITE_JSON=$(jq -n \
     --arg proof_count "$(echo "$CURRENT_PROOFS_JSON" | jq 'length')" \
+    --argjson total_assertions "$TOTAL_ASSERTIONS" \
     --argjson new "$NEW_PROOFS" \
     --argjson removed "$REMOVED_PROOFS" \
     --argjson changed "$CHANGED_PROOFS" \
-    '{proof_count: ($proof_count | tonumber), total_assertions: 0, new: $new, removed: $removed, changed: $changed}')
+    '{proof_count: ($proof_count | tonumber), total_assertions: $total_assertions, new: $new, removed: $removed, changed: $changed}')
 
 # Build ledger entry
 # The proofs object goes in on STDIN, not as --argjson: Linux caps a single
