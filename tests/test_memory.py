@@ -252,3 +252,16 @@ def test_merge_adds_values_at_shared_keys():
     assert a.conflicts(a) == 11 and a.agreeing(a) == 11
     assert a.agreeing(ExactMemory.build({11: 6})) == 1
     assert (a - ExactMemory.build({11: 4})).get(11) == 1  # delete needs the value
+
+
+def test_build_by_product_tree_matches_the_direct_sum():
+    """build sums Σ v/q over a product tree; it must equal Σ v·(D/q) mod D."""
+    from math import prod
+
+    rng = random.Random(1401)
+    for K in (1, 2, 3, 17, 200):
+        facts = {q: rng.randrange(1, q) for q in rng.sample(KEYS, K)}
+        D = prod(facts)
+        N = sum(v * (D // q) for q, v in facts.items()) % D
+        mem = ExactMemory.build(facts)
+        assert (mem.N, mem.D) == (N, D)

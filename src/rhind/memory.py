@@ -35,15 +35,39 @@ orders is zero. So `rebind` reads, then writes (proof 002, P5).
 from __future__ import annotations
 
 from fractions import Fraction
-from math import gcd, prod
+from functools import lru_cache
+from math import gcd, isqrt, prod
 
 from rhind.dictionary import PrimeDictionary
 from rhind.primes import is_prime
 
+_is_key = lru_cache(maxsize=1 << 16)(is_prime)  # queries repeat keys
 
+
+@lru_cache(maxsize=4096)
 def _primorial(x: int) -> int:
-    """Product of the primes ≤ x (x small: a value, not a key)."""
-    return prod(p for p in range(2, x + 1) if is_prime(p))
+    """Product of the primes ≤ x (x small: a value, not a key), by sieve."""
+    if x < 2:
+        return 1
+    sieve = bytearray([1]) * (x + 1)
+    sieve[0] = sieve[1] = 0
+    for p in range(2, isqrt(x) + 1):
+        if sieve[p]:
+            sieve[p * p :: p] = bytearray(len(range(p * p, x + 1, p)))
+    return prod(p for p in range(2, x + 1) if sieve[p])
+
+
+def _sum_tree(items: list) -> tuple:
+    """Σ v/q as (N, D) over a balanced product tree: N/D = N_L/D_L + N_R/D_R
+    with D = D_L·D_R. Subquadratic with fast multiplication, where computing
+    each D/q separately costs K big divisions (quadratic)."""
+    if len(items) == 1:
+        q, v = items[0]
+        return v, q
+    mid = len(items) // 2
+    nl, dl = _sum_tree(items[:mid])
+    nr, dr = _sum_tree(items[mid:])
+    return nl * dr + nr * dl, dl * dr
 
 
 def _den(F: Fraction) -> int:
@@ -81,9 +105,10 @@ class ExactMemory:
                 raise ValueError(f"key {q} is not prime")
             if not 0 < v < q:
                 raise ValueError(f"value {v} for key {q} must lie in 1 … {q - 1}")
-        D = prod(facts) if facts else 1
-        N = sum(v * (D // q) for q, v in facts.items())
-        return cls(Fraction(N % D, D) if D > 1 else Fraction(0))
+        if not facts:
+            return cls()
+        N, D = _sum_tree(list(facts.items()))
+        return cls(Fraction(N % D, D))
 
     # ── reading ───────────────────────────────────────────────────────
 
@@ -101,14 +126,14 @@ class ExactMemory:
         q must be prime: a product of present keys divides D too, and 1
         divides everything, so without the check `get(143)` on keys 11 and 13
         would answer. "No false positives" holds for prime queries."""
-        if not is_prime(q):
+        if not _is_key(q):
             raise ValueError(f"key {q} is not prime")
         if self.D % q:
             return None
         return self.N % q * pow((self.D // q) % q, -1, q) % q or None
 
     def __contains__(self, q: int) -> bool:
-        return is_prime(q) and self.D % q == 0
+        return self.D % q == 0 and _is_key(q)
 
     def keys(self, dic: PrimeDictionary) -> list:
         """Keys present, by factoring D over a known dictionary."""

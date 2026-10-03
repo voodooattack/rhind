@@ -1,0 +1,238 @@
+{
+ "title": "006 — Against ordinary data structures, the exact memory wins on nothing measurable",
+ "sections": [
+  {
+   "title": "P1–P2 — same answers, and the size of each representation",
+   "headers": [
+    "m",
+    "agree",
+    "packed",
+    "schema",
+    "frac",
+    "packed_vs_schema",
+    "frac_vs_packed"
+   ],
+   "labels": [
+    "roles m",
+    "all four agree",
+    "packed bits",
+    "schema N bits",
+    "fraction bits",
+    "packed ÷ schema N",
+    "fraction ÷ packed"
+   ],
+   "legend": {
+    "agree": "record pairs (of 200) on which get, holding, agreeing and merge agree across all four",
+    "schema": "worst case over the records",
+    "frac": "worst case over the records"
+   },
+   "rows": [
+    {
+     "m": 10,
+     "agree": "200/200",
+     "packed": 110,
+     "schema": 101,
+     "frac": 202,
+     "packed_vs_schema": "1.08×",
+     "frac_vs_packed": "1.83×"
+    },
+    {
+     "m": 100,
+     "agree": "200/200",
+     "packed": 1100,
+     "schema": 1039,
+     "frac": 1771,
+     "packed_vs_schema": "1.05×",
+     "frac_vs_packed": "1.61×"
+    },
+    {
+     "m": 1000,
+     "agree": "200/200",
+     "packed": 11000,
+     "schema": 12090,
+     "frac": 18971,
+     "packed_vs_schema": "0.90×",
+     "frac_vs_packed": "1.72×"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P1–P2",
+     "value": "all four representations answer every operation identically; packed fields cost about what schema-mode N costs, and the fraction about twice"
+    }
+   ]
+  },
+  {
+   "title": "P3–P4 — time per operation",
+   "headers": [
+    "m",
+    "op",
+    "frac",
+    "schema",
+    "packed",
+    "dict"
+   ],
+   "labels": [
+    "roles m",
+    "operation",
+    "fraction ns",
+    "schema N ns",
+    "packed ns",
+    "dict ns"
+   ],
+   "legend": {
+    "frac": "median over repetitions of the operation on 20 record pairs, integer ns per operation",
+    "schema": "holding and agreeing are not defined on N without D; merge and get are"
+   },
+   "rows": [
+    {
+     "m": 10,
+     "op": "get",
+     "frac": 360,
+     "schema": 305,
+     "packed": 132,
+     "dict": 56
+    },
+    {
+     "m": 10,
+     "op": "holding",
+     "frac": 3780,
+     "schema": "—",
+     "packed": 221,
+     "dict": 299
+    },
+    {
+     "m": 10,
+     "op": "agreeing",
+     "frac": 2239,
+     "schema": "—",
+     "packed": 273,
+     "dict": 458
+    },
+    {
+     "m": 10,
+     "op": "merge",
+     "frac": 1927,
+     "schema": 95,
+     "packed": 60,
+     "dict": 144
+    },
+    {
+     "m": 100,
+     "op": "get",
+     "frac": 513,
+     "schema": 566,
+     "packed": 146,
+     "dict": 55
+    },
+    {
+     "m": 100,
+     "op": "holding",
+     "frac": 9456,
+     "schema": "—",
+     "packed": 284,
+     "dict": 1971
+    },
+    {
+     "m": 100,
+     "op": "agreeing",
+     "frac": 5476,
+     "schema": "—",
+     "packed": 327,
+     "dict": 3732
+    },
+    {
+     "m": 100,
+     "op": "merge",
+     "frac": 3348,
+     "schema": 123,
+     "packed": 64,
+     "dict": 669
+    },
+    {
+     "m": 1000,
+     "op": "get",
+     "frac": 3281,
+     "schema": 3692,
+     "packed": 234,
+     "dict": 64
+    },
+    {
+     "m": 1000,
+     "op": "holding",
+     "frac": 234831,
+     "schema": "—",
+     "packed": 1113,
+     "dict": 17896
+    },
+    {
+     "m": 1000,
+     "op": "agreeing",
+     "frac": 205085,
+     "schema": "—",
+     "packed": 1188,
+     "dict": 38844
+    },
+    {
+     "m": 1000,
+     "op": "merge",
+     "frac": 59404,
+     "schema": 888,
+     "packed": 128,
+     "dict": 6952
+    }
+   ],
+   "findings": [
+    {
+     "label": "P3–P4",
+     "value": "at m ≥ 100 the packed record answers the holistic queries at least 2× faster than the fraction and the dict is faster too (only ≈ 1.7× on agreeing at m = 100); at m = 1,000 both read, query and merge ≥ 2× faster"
+    }
+   ]
+  },
+  {
+   "title": "P5 — the self-describing case: keys hashed to primes",
+   "headers": [
+    "K",
+    "frac",
+    "sorted",
+    "ratio"
+   ],
+   "labels": [
+    "facts K",
+    "fraction bits",
+    "sorted (hash, value) bits",
+    "fraction ÷ sorted"
+   ],
+   "legend": {
+    "frac": "keys: random 61-bit primes (a hash to a prime), values 1 … 999",
+    "sorted": "K · (64 + 10) bits: a sorted list of 64-bit key hashes with their values"
+   },
+   "rows": [
+    {
+     "K": 10,
+     "frac": 1162,
+     "sorted": 740,
+     "ratio": "1.57×"
+    },
+    {
+     "K": 100,
+     "frac": 12073,
+     "sorted": 7400,
+     "ratio": "1.63×"
+    },
+    {
+     "K": 1000,
+     "frac": 121103,
+     "sorted": 74000,
+     "ratio": "1.63×"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P5",
+     "value": "with no shared dictionary the fraction stores two ≈ 61-bit numbers' worth per fact (N and D) against 74 bits for a sorted list of hashes"
+    }
+   ]
+  }
+ ]
+}

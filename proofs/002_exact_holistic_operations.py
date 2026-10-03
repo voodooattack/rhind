@@ -31,6 +31,24 @@ Predictions, on record BEFORE running (exploration 037 measured P1–P4):
       share one group, which is also why they are noisy.) Checked exhaustively
       for all prime pairs below 200.
 
+Added 2026-10-03 after a cold review (its check c05 measured these): the
+one-shot MAP procedures above are not the procedures the exact memory uses.
+The exact analogy is two steps (find the role holding x in B, read A there);
+the exact agreeing query returns the SET of agreeing roles. Giving MAP-I the
+same two steps — x's role by clean-up of x ⊙ B against the role codebook,
+then the filler by clean-up of role ⊙ A against that role's 100 fillers —
+and the agreeing set by per-role clean-up of both records:
+  P2b MAP-I two-step analogy at n = 10,000: ≥ 95% at every m (c05: 100/100
+      at m = 10, 30, 100). At the exact records' bits: < 50% at every m.
+  P3b MAP-I agreeing SET by per-role clean-up at n = 10,000: ≥ 95% at every
+      m (c05: 100/100). At the exact records' bits: < 50% for m ≥ 10.
+      (First written "at every m"; a dry run before the receipt gave 58/100
+      at m = 3, where the same bits are 16 dimensions for three roles and
+      a chance match is likely. Revised, and recorded here.)
+So at n = 10,000 the gap in P2/P3 is the procedure, not VSA noise; what
+remains is the cost: m clean-ups over a 10,000-dimensional record against
+one big-number operation, and at equal storage MAP-I fails either way.
+
 Exact integers and Fractions; numpy only as an int64 engine for MAP-I. The
 plot receives integers.
 
@@ -74,6 +92,12 @@ class _Map:
     def cleanup(self, v):
         return int((self.fill @ v).argmax())
 
+    def role_cleanup(self, v):
+        """Per-role clean-up: role r's filler offset (0 … VF−1) in r ⊙ v."""
+        m = self.roles.shape[0] - 1
+        f3 = self.fill.reshape(m, VF, self.n)
+        return np.einsum("rfn,rn->rf", f3, self.roles[:m] * v).argmax(axis=1).tolist()
+
 
 @proof_report(
     title="002 — Exact holistic operations, and why re-binding cannot be one",
@@ -92,10 +116,14 @@ def run():
             "ex_bits",
             "an",
             "ag",
+            "an2",
+            "ag2",
             "rb",
             "map_bits",
             "an_m",
             "ag_m",
+            "an2_m",
+            "ag2_m",
             "rb_m",
         ],
         labels=[
@@ -104,16 +132,22 @@ def run():
             "exact bits",
             "MAP 10k: analogy",
             "MAP 10k: agreeing count",
+            "MAP 10k: two-step analogy",
+            "MAP 10k: agreeing set",
             "MAP 10k: re-binding",
             "MAP 10k bits",
             "MAP same bits: analogy",
             "same bits: agreeing",
+            "same bits: two-step analogy",
+            "same bits: agreeing set",
             "same bits: re-binding",
         ],
-        align=["r"] * 10,
+        align=["r"] * 14,
         legend={
             "ex": f"correct operations of {3 * TRIALS} (analogy, agreeing roles, re-binding)",
             "an": f"correct of {TRIALS}; analogy pairs share no filler (Kanerva's setting)",
+            "an2": "the exact memory's procedure: x's role by clean-up of x ⊙ B against the roles, then A's filler there",
+            "ag2": "the set of agreeing roles, by per-role clean-up of both records (100 fillers each)",
         },
     )
     def _rows():
@@ -165,7 +199,7 @@ def run():
                 M = _Map(m, n, rng_np)
                 dv = [M.record(fs) for fs in disjoint]
                 sv = [M.record(fs) for fs in similar]
-                an = ag = rb = 0
+                an = ag = rb = an2 = ag2 = 0
                 for t in range(TRIALS):
                     fa, fb = disjoint[2 * t], disjoint[2 * t + 1]
                     r = rng.randrange(m)
@@ -175,11 +209,27 @@ def run():
                     ag += round(int(sv[2 * t] @ sv[2 * t + 1]) / n) == sum(
                         ga[i] == gb[i] for i in range(m)
                     )
+                    x = fb[r]
+                    rh = int((M.roles[:m] @ (M.fill[x] * B)).argmax())
+                    an2 += rh * VF + M.role_cleanup(A)[rh] == fa[r]
+                    ag2 += {
+                        i
+                        for i, (c, d) in enumerate(
+                            zip(
+                                M.role_cleanup(sv[2 * t]), M.role_cleanup(sv[2 * t + 1])
+                            )
+                        )
+                        if c == d
+                    } == {i for i in range(m) if ga[i] == gb[i]}
                     f = M.cleanup(M.roles[r] * A)
                     moved = A - M.roles[r] * M.fill[f] + M.roles[m] * M.fill[f]
                     rb += M.cleanup(M.roles[m] * moved) == fa[r]
-                res[label] = (an, ag, rb, n * (2 * m + 1).bit_length())
-            an, ag, rb, mbits = res["10k"]
+                res[label] = (an, ag, rb, n * (2 * m + 1).bit_length(), an2, ag2)
+            an, ag, rb, mbits, an2, ag2 = res["10k"]
+            assert 100 * an2 >= 95 * TRIALS and 100 * ag2 >= 95 * TRIALS  # P2b, P3b
+            assert 2 * res["same"][4] < TRIALS  # P2b
+            if m >= 10:
+                assert 2 * res["same"][5] < TRIALS  # P3b
             if m <= 10:
                 assert 100 * an >= 95 * TRIALS and 100 * ag >= 95 * TRIALS  # P2, P3
             if m == 100:
@@ -187,7 +237,13 @@ def run():
             assert 100 * rb >= 95 * TRIALS  # P4
             assert 2 * res["same"][0] < TRIALS  # P2
             curve.append(
-                (m, 1000, 1000 * an // TRIALS, 1000 * res["same"][0] // TRIALS)
+                (
+                    m,
+                    1000,
+                    1000 * an // TRIALS,
+                    1000 * an2 // TRIALS,
+                    1000 * res["same"][0] // TRIALS,
+                )
             )
             yield row(
                 m=m,
@@ -195,16 +251,22 @@ def run():
                 ex_bits=ex_bits,
                 an=an,
                 ag=ag,
+                an2=an2,
+                ag2=ag2,
                 rb=rb,
                 map_bits=mbits,
                 an_m=res["same"][0],
                 ag_m=res["same"][1],
+                an2_m=res["same"][4],
+                ag2_m=res["same"][5],
                 rb_m=res["same"][2],
             )
         yield finding(
             "P1–P4",
             "every exact operation correct at every m, at a small fraction of MAP-I's "
-            "storage; MAP-I's analogy and agreeing counts degrade with record size",
+            "storage; MAP-I's ONE-SHOT analogy and agreeing count degrade with record "
+            "size, but given the exact memory's two-step procedure (m clean-ups) MAP-I "
+            "is perfect at n = 10,000; at equal storage it fails either way",
         )
 
     @verified_section("P5 — no additive map moves a value between keys")
@@ -245,9 +307,19 @@ def run():
         """The exact analogy is correct at every size by construction. MAP-I's
         mapping vector A ⊙ B carries m² cross terms, so its signal-to-noise
         falls like √n/m: fine at n = 10,000 for small records, gone by m = 100,
-        and never usable at the exact records' storage."""
-        for m, ex, ten, same in curve:
-            yield point(m, exact=ex, **{"MAP n=10,000": ten, "MAP same bits": same})
+        and never usable at the exact records' storage. The two-step procedure
+        (the exact memory's own) has no cross terms and stays perfect at
+        n = 10,000, at the price of m clean-ups."""
+        for m, ex, ten, ten2, same in curve:
+            yield point(
+                m,
+                exact=ex,
+                **{
+                    "MAP n=10,000 one-shot": ten,
+                    "MAP n=10,000 two-step": ten2,
+                    "MAP same bits": same,
+                },
+            )
 
     _rows()
     _hom()

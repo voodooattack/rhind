@@ -9,10 +9,14 @@
     "ex_bits",
     "an",
     "ag",
+    "an2",
+    "ag2",
     "rb",
     "map_bits",
     "an_m",
     "ag_m",
+    "an2_m",
+    "ag2_m",
     "rb_m"
    ],
    "labels": [
@@ -21,15 +25,21 @@
     "exact bits",
     "MAP 10k: analogy",
     "MAP 10k: agreeing count",
+    "MAP 10k: two-step analogy",
+    "MAP 10k: agreeing set",
     "MAP 10k: re-binding",
     "MAP 10k bits",
     "MAP same bits: analogy",
     "same bits: agreeing",
+    "same bits: two-step analogy",
+    "same bits: agreeing set",
     "same bits: re-binding"
    ],
    "legend": {
     "ex": "correct operations of 300 (analogy, agreeing roles, re-binding)",
-    "an": "correct of 100; analogy pairs share no filler (Kanerva's setting)"
+    "an": "correct of 100; analogy pairs share no filler (Kanerva's setting)",
+    "an2": "the exact memory's procedure: x's role by clean-up of x ⊙ B against the roles, then A's filler there",
+    "ag2": "the set of agreeing roles, by per-role clean-up of both records (100 fillers each)"
    },
    "rows": [
     {
@@ -38,10 +48,14 @@
      "ex_bits": 49,
      "an": 100,
      "ag": 100,
+     "an2": 100,
+     "ag2": 100,
      "rb": 100,
      "map_bits": 30000,
      "an_m": 7,
      "ag_m": 35,
+     "an2_m": 44,
+     "ag2_m": 58,
      "rb_m": 16
     },
     {
@@ -50,10 +64,14 @@
      "ex_bits": 201,
      "an": 100,
      "ag": 100,
+     "an2": 100,
+     "ag2": 100,
      "rb": 100,
      "map_bits": 50000,
      "an_m": 0,
      "ag_m": 21,
+     "an2_m": 20,
+     "ag2_m": 17,
      "rb_m": 0
     },
     {
@@ -62,10 +80,14 @@
      "ex_bits": 695,
      "an": 42,
      "ag": 80,
+     "an2": 100,
+     "ag2": 100,
      "rb": 100,
      "map_bits": 60000,
      "an_m": 0,
      "ag_m": 11,
+     "an2_m": 19,
+     "ag2_m": 8,
      "rb_m": 1
     },
     {
@@ -74,17 +96,21 @@
      "ex_bits": 2668,
      "an": 0,
      "ag": 40,
+     "an2": 100,
+     "ag2": 100,
      "rb": 100,
      "map_bits": 80000,
      "an_m": 0,
      "ag_m": 6,
+     "an2_m": 3,
+     "ag2_m": 4,
      "rb_m": 0
     }
    ],
    "findings": [
     {
      "label": "P1–P4",
-     "value": "every exact operation correct at every m, at a small fraction of MAP-I's storage; MAP-I's analogy and agreeing counts degrade with record size"
+     "value": "every exact operation correct at every m, at a small fraction of MAP-I's storage; MAP-I's ONE-SHOT analogy and agreeing count degrade with record size, but given the exact memory's two-step procedure (m clean-ups) MAP-I is perfect at n = 10,000; at equal storage it fails either way"
     }
    ]
   },
@@ -120,25 +146,29 @@
     {
      "x": 3,
      "exact": 1000,
-     "MAP n=10,000": 1000,
+     "MAP n=10,000 one-shot": 1000,
+     "MAP n=10,000 two-step": 1000,
      "MAP same bits": 70
     },
     {
      "x": 10,
      "exact": 1000,
-     "MAP n=10,000": 1000,
+     "MAP n=10,000 one-shot": 1000,
+     "MAP n=10,000 two-step": 1000,
      "MAP same bits": 0
     },
     {
      "x": 30,
      "exact": 1000,
-     "MAP n=10,000": 420,
+     "MAP n=10,000 one-shot": 420,
+     "MAP n=10,000 two-step": 1000,
      "MAP same bits": 0
     },
     {
      "x": 100,
      "exact": 1000,
-     "MAP n=10,000": 0,
+     "MAP n=10,000 one-shot": 0,
+     "MAP n=10,000 two-step": 1000,
      "MAP same bits": 0
     }
    ]
