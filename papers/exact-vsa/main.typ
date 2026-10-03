@@ -8,6 +8,7 @@
 #let d001 = json("/reports/001_exact_memory_vs_noisy_vsa_data.json")
 #let d002 = json("/reports/002_exact_holistic_operations_data.json")
 #let d003 = json("/reports/003_schema_mode_data.json")
+#let d004 = json("/reports/004_graded_nearness_data.json")
 
 #let sec(d, prefix) = d.sections.find(s => s.title.starts-with(prefix))
 #let at-k(s, key, value) = s.rows.find(r => r.at(key) == value)
@@ -50,6 +51,8 @@
 #let h5 = sec(d002, "P5")
 #let s1 = sec(d003, "P1–P3")
 #let s4 = sec(d003, "P4")
+#let g1 = sec(d004, "P1–P4")
+#let g5 = sec(d004, "P5")
 
 #set document(title: "Exact Vector-Symbolic Memory from Partial Fractions", author: "Abdullah Ali")
 #set page(paper: "a4", margin: (x: 2.2cm, y: 2.4cm), numbering: "1")
@@ -128,6 +131,9 @@ decomposition of the sum is unique, and every fact is recoverable.
   roles, each by one subtraction and a denominator (@sec-holistic).
 - A proof that no exact memory of this kind has a holistic re-binding
   (@sec-rebind).
+- Graded nearness without noise: keys at $q$-adic precision, where one
+  subtraction gives every role's depth of agreement with a probe, and its
+  boundary, similarity that is not a shared prefix (@sec-graded).
 - An empirical comparison at equal storage against a bipolar VSA, against
   FHRR, and against the exact VSA of Deng and Raviv
   @dengraviv2025histogram, with every number produced by an executable
@@ -207,8 +213,8 @@ factor alias outright: $1\/6 + 1\/10 = 4\/15 = 2\/3 + 3\/5$, so two
 different memories have the same fraction. What fails is a key mixing
 different primes. A prime power is sound ($5\/25 = 1\/5$ keeps the prime
 $5$ and records how many base-$5$ digits of the value are zero); that is
-the starting point of graded nearness, which we leave to future work. We
-use prime keys throughout.
+the starting point of graded nearness (@sec-graded). Elsewhere we use
+prime keys.
 
 *Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
 bits. With keys the primes above the value range, this is about
@@ -275,6 +281,36 @@ $"den"(F_A - F_B) = product q$ over keys where the records differ (a key
 stored in only one counts as differing), so
 $"lcm"(D_A, D_B) \/ "den"(F_A - F_B)$ is the product of the keys on which
 they agree.
+
+== Graded nearness <sec-graded>
+
+The memory so far answers equality. Precision gives it graded nearness.
+Give each prime key $q$ a precision $k_q$ and let its value $v_q$ live in
+$ZZ\/q^(k_q)$, stored as $v_q\/q^(k_q)$. Two values agree to depth $j$ when
+their last $j$ base-$q$ digits are equal, $j = min(k_q, nu_q (v - x))$,
+with $nu_q$ the $q$-adic valuation.
+
+#theorem("Proposition 4 (graded agreement)")[
+  For records $F = sum v_q \/ q^(k_q)$ and $P = sum x_q \/ q^(k_q)$ on the
+  same keys, the exponent of $q$ in $"den"(F - P)$ is $k_q - j_q$, where
+  $j_q$ is the depth to which $v_q$ and $x_q$ agree.
+]
+#proof[
+  The $q$-term of $F - P$ is $(v_q - x_q)\/q^(k_q)$. Writing
+  $v_q - x_q = q^(j_q) u$ with $q divides.not u$ (or $0$, when $j_q = k_q$),
+  it reduces to $u \/ q^(k_q - j_q)$, and terms at distinct primes do not
+  interact (Proposition 1).
+]
+
+So one subtraction, against a probe record or another record, gives every
+role's depth at once. Depth is an ultrametric (two values agreeing to depth
+$i$ and $j$ with a third agree to depth $min(i, j)$ with each other). It
+means something only if the encoding puts meaning in the low digits: for a
+hierarchy, write the root's choice as the last digit, the next level's as
+the one before, and so on, and the depth becomes the number of shared
+ancestors. Similarity that is not a shared prefix — a red car and a blue
+car share a kind but not a colour — cannot be expressed: the order of the
+levels is the model (@sec-graded-exp).
 
 == Re-binding is not holistic <sec-rebind>
 
@@ -441,6 +477,34 @@ $D$ wins only at #at-k(s4, "best", "D").K keys; a gap code wins from about
 the fraction form's self-description costs little in very sparse memories
 and should be traded for a schema or an index code in dense ones.
 
+== Graded nearness <sec-graded-exp>
+
+A taxonomy of 4 levels with branching 4 (256 leaves); records of $m$ roles,
+each holding a leaf encoded in its key's base. Probe depths are prescribed
+uniformly in ${0, dots, 4}$, so a fixed guess scores 20%. MAP-I encodes a
+leaf as the sum of one vector per ancestor prefix, so that its dot product
+counts shared ancestors. To compare two records role-wise it must first
+clean up each unbound role to the nearest of the 256 leaves: without that,
+$(r dot.o R_A) dot (r dot.o R_B) = R_A dot R_B$ for every role $r$, since
+$r dot.o r = 1$, and only the whole-record similarity remains.
+
+#datatable(
+  g1,
+  ("m", "ex_q1", "ex_q2", "ex_bits", "map_bits", "map_q1", "map_q2", "same_q1", "same_q2"),
+  ("roles m", "exact: probe", "exact: records", "exact bits", "MAP bits", "MAP: probe", "MAP: records", "same bits: probe", "records"),
+  [Role-wise depth of agreement, to a probe item and between two records. MAP at $n = "10,000"$ (records compared after clean-up) and at the exact record's bits.],
+) <tab-graded>
+
+Every exact depth is right, from one subtraction, at #fmt(at-k(g1, "m", 100).ex_bits)
+bits for 100 roles against MAP's #fmt(at-k(g1, "m", 100).map_bits) bits, and
+MAP's probe query falls to #cell(g1, "m", 100, "map_q1") at 100 roles (@tab-graded). On
+similarity that is not a shared prefix the roles reverse: over all ordered
+pairs of 256 leaves read as four independent attributes, $q$-adic depth
+equals the number of shared attributes for exactly
+#g5.rows.at(0).fraction of them (the pairs whose shared attributes happen
+to form a prefix), while a MAP bag of attribute vectors recovers the count
+for #g5.rows.at(0).bag_ok random pairs.
+
 = Limitations <sec-limits>
 
 - *No noise tolerance.* One flipped bit of $N$ or $D$ corrupts the whole
@@ -452,8 +516,10 @@ and should be traded for a schema or an index code in dense ones.
 - *Keys are primes and bound values.* Symbols need a prime dictionary
   (composite keys break closure under addition, @sec-memory), and values
   must be smaller than every key that may hold them.
-- *No similarity between values.* Atoms are not similarity-preserving; the
-  memory answers equality, not nearness.
+- *Nearness only along a hierarchy.* Atoms are not similarity-preserving.
+  Graded nearness exists for prefix-shaped similarity (@sec-graded), not
+  for overlapping attributes, where a VSA bag is right and $q$-adic depth
+  is not.
 - *What is new is narrow.* The algebra (partial fractions, the CRT,
   prime-product sets) is classical, and the secure lock already stores
   values this way. Our contribution is the VSA interface — superposition,
@@ -466,15 +532,16 @@ Superposition does not have to be noisy. Writing a key–value memory as one
 reduced fraction gives exact recall, exact absence, and merge and delete as
 arithmetic, at about 1.3× the information floor — or at the floor itself
 when the key set is known and only the numerator is kept; its denominator turns
-value queries, analogy and role agreement into one subtraction each. It does
-not re-bind holistically, and cannot. Against VSAs at equal storage, the
+value queries, analogy and role agreement into one subtraction each, and
+with $q$-adic precision it grades nearness along a hierarchy, though not
+across overlapping attributes. It does not re-bind holistically, and cannot. Against VSAs at equal storage, the
 noisy ones fail and the exact one costs orders of magnitude more, buying
 noise tolerance. The practical question this leaves is the one a dictionary
 never asks: which applications want VSA-style operations _and_ exactness —
 symbolic reasoning over small structured records is the natural candidate.
 
 *Reproducibility.* The library (`rhind.memory`), the proofs
-(001–003) and their data files are in the accompanying repository;
+(001–004) and their data files are in the accompanying repository;
 rerunning a proof regenerates its report and data, and recompiling this
 document regenerates every table.
 

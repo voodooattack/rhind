@@ -1,0 +1,126 @@
+{
+ "title": "004 — Graded nearness: q-adic agreement depth, exact and holistic",
+ "sections": [
+  {
+   "title": "P1–P4 — role-wise graded nearness against MAP-I",
+   "headers": [
+    "m",
+    "ex_q1",
+    "ex_q2",
+    "ex_bits",
+    "ex_us",
+    "map_bits",
+    "map_q1",
+    "map_q2",
+    "same_q1",
+    "same_q2"
+   ],
+   "labels": [
+    "roles m",
+    "exact Q1",
+    "exact Q2",
+    "exact bits",
+    "exact µs",
+    "MAP bits (n=10,000)",
+    "MAP Q1",
+    "MAP Q2 (clean-up)",
+    "same bits: Q1",
+    "same bits: Q2"
+   ],
+   "legend": {
+    "ex_q1": "roles whose depth to the probe is right",
+    "ex_us": "one agreement_with call for all roles",
+    "map_q2": "clean-up to the nearest of 256 leaves; 10 records per m",
+    "same_q1": "MAP-I with n chosen so its counters use the exact record's bits"
+   },
+   "rows": [
+    {
+     "m": 3,
+     "ex_q1": "120/120",
+     "ex_q2": "120/120",
+     "ex_bits": 35,
+     "ex_us": 2,
+     "map_bits": 50000,
+     "map_q1": "100%",
+     "map_q2": "100%",
+     "same_q1": "28%",
+     "same_q2": "26%"
+    },
+    {
+     "m": 10,
+     "ex_q1": "400/400",
+     "ex_q2": "400/400",
+     "ex_bits": 161,
+     "ex_us": 5,
+     "map_bits": 60000,
+     "map_q1": "100%",
+     "map_q2": "100%",
+     "same_q1": "34%",
+     "same_q2": "22%"
+    },
+    {
+     "m": 30,
+     "ex_q1": "1200/1200",
+     "ex_q2": "1200/1200",
+     "ex_bits": 664,
+     "ex_us": 12,
+     "map_bits": 70000,
+     "map_q1": "98%",
+     "map_q2": "100%",
+     "same_q1": "34%",
+     "same_q2": "23%"
+    },
+    {
+     "m": 100,
+     "ex_q1": "4000/4000",
+     "ex_q2": "4000/4000",
+     "ex_bits": 2982,
+     "ex_us": 75,
+     "map_bits": 80000,
+     "map_q1": "81%",
+     "map_q2": "99%",
+     "same_q1": "36%",
+     "same_q2": "27%"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P1–P4",
+     "value": "every role's depth is exact from one subtraction, at under a tenth of MAP-I's bits; MAP-I needs n = 10,000 and, to compare records role-wise, a clean-up, because without one the role cancels and only the whole-record similarity R_A · R_B remains"
+    }
+   ]
+  },
+  {
+   "title": "P5 — the boundary: similarity that is not a shared prefix",
+   "headers": [
+    "pairs",
+    "prefix_ok",
+    "fraction",
+    "bag_ok"
+   ],
+   "labels": [
+    "ordered pairs",
+    "q-adic depth = shared attributes",
+    "as a fraction",
+    "MAP-I bag (n=10,000)"
+   ],
+   "legend": {
+    "bag_ok": "Σ of attribute vectors; 5,000 random pairs"
+   },
+   "rows": [
+    {
+     "pairs": 65536,
+     "prefix_ok": 30976,
+     "fraction": "121/256",
+     "bag_ok": "5000/5000"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P5",
+     "value": "q-adic depth sees only the shared prefix: it equals the shared-attribute count for exactly 121/256 of pairs, where a VSA bag gets them all; the order of the levels is the model"
+    }
+   ]
+  }
+ ]
+}

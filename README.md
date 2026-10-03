@@ -39,6 +39,7 @@ asserts predictions written down before its first run. It writes a report
 | `proofs/001_exact_memory_vs_noisy_vsa.py` | Exact recall at ≈ 1.3× the information floor. At equal bits, MAP-I and FHRR both fail. The exact VSA of Deng & Raviv needs 50–8,000× the bits. |
 | `proofs/002_exact_holistic_operations.py` | Value queries, analogy and role agreement are exact. Re-binding must read the value. |
 | `proofs/003_schema_mode.py` | With a known key set, store N alone: 1.01× the floor for a 10-role record, half the fraction form. Merge and value queries survive. |
+| `proofs/004_graded_nearness.py` | Keys at q-adic precision: one subtraction gives every role's depth of agreement (shared ancestors), exact at a fraction of MAP-I's bits. Boundary: non-prefix similarity. |
 
 The paper draft in `papers/exact-vsa/` reads every table from those data
 files, so rerunning the proofs and recompiling regenerates it.

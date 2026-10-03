@@ -1,6 +1,9 @@
 """
 042 — Graded nearness: q-adic agreement depth against a VSA's similarity.
 
+PROMOTED 2026-10-03 → proofs/004 (claims). Kept here as the original
+exploration record.
+
 The exact memory answers equality only (proofs 001–003). rhind.adic gives
 each prime key a precision k and reads nearness q-adically: one subtraction
 reports, for every key, how many trailing base-q digits its value shares
