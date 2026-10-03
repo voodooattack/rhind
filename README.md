@@ -59,6 +59,8 @@ src/rhind/          the library: memory, prime dictionary, primes
 src/proofreport/    proof-as-code machinery (reports, hashes, data files)
 proofs/             the proofs
 reports/            their receipts and data files
+.ledger/index.jsonl one line per commit: which proofs were re-run, and why
+scripts/            the pre-commit hook that appends to the ledger
 tests/              library tests
 papers/exact-vsa/   the paper (Typst)
 notes/              literature survey with verdicts per claim

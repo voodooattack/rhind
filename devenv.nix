@@ -16,10 +16,24 @@
 
   packages = with pkgs; [
     git
+    jq  # the proof-ledger hook
     typst
   ];
 
-  git-hooks.hooks.black.enable = true;
+  git-hooks.hooks = {
+    black.enable = true;
+
+    # Append one line per commit to .ledger/index.jsonl: which proofs were
+    # re-run since the last commit, and which hash tier changed (source,
+    # deps, env, full). Proofs whose hash did not change are carried forward.
+    proof-metrics-ledger = {
+      enable = true;
+      name = "proof-metrics-ledger";
+      entry = "bash scripts/update-proof-ledger.sh";
+      language = "system";
+      pass_filenames = false;
+    };
+  };
 
   scripts = {
     rhind_tests.exec = "uv run pytest";
