@@ -20,8 +20,10 @@ depths are prescribed uniformly in {0,…,4}, so a fixed guess scores 20%.
   Q2  role-wise depth between two records. exact: agreement_with(other)
       MAP-I: clean up role ⊙ R_A and role ⊙ R_B to their nearest leaves
       (256-leaf argmax), then the depth between the two leaves.
-  Q3  similarity that is not a shared prefix: leaves as 4 independent
-      attributes; similarity = number of shared attributes.
+  Q3  similarity that is not a shared prefix, INSIDE ONE VALUE: leaves as 4
+      independent attributes packed into one value; similarity = number of
+      shared attributes. (One attribute per key recovers that count exactly;
+      that is proof 005.)
 
 Predictions, on record BEFORE running (exploration 042 measured them):
   P1  Exact Q1 and Q2 depths are right for every role of every record, at
@@ -34,10 +36,12 @@ Predictions, on record BEFORE running (exploration 042 measured them):
       role ⊙ role = 1. Asserted as an identity on every record.
   P4  MAP-I Q2 with clean-up at n = 10,000: ≥ 95% at every m. At the exact
       record's bits: < 50%.
-  P5  Q3 over all 65,536 ordered pairs: q-adic depth equals the shared-
-      attribute count for exactly 121/256 of them (the pairs whose shared
-      attributes form a prefix, Σ_j (1/4)^j (3/4)^(4−j)); a MAP-I attribute
-      bag at n = 10,000 recovers the count for ≥ 99% of 5,000 pairs.
+  P5  Q3 over all 65,536 ordered pairs: the depth of ONE value equals the
+      shared-attribute count for exactly 121/256 of them (the pairs whose
+      shared attributes form a prefix, Σ_j (1/4)^j (3/4)^(4−j)); a MAP-I
+      attribute bag at n = 10,000 recovers the count for ≥ 99% of 5,000
+      pairs. This bounds nearness within a value, not within a record:
+      proof 005 puts each attribute on its own key and gets every pair.
 
 Exact integers and Fractions; numpy only as an int64 engine for MAP-I.
 Timings are measurements, in whole microseconds.
@@ -228,12 +232,12 @@ def run():
             "only the whole-record similarity R_A · R_B remains",
         )
 
-    @verified_section("P5 — the boundary: similarity that is not a shared prefix")
+    @verified_section("P5 — inside one value, nearness is a shared prefix")
     @table(
         headers=["pairs", "prefix_ok", "fraction", "bag_ok"],
         labels=[
             "ordered pairs",
-            "q-adic depth = shared attributes",
+            "one value: depth = shared attributes",
             "as a fraction",
             "MAP-I bag (n=10,000)",
         ],
@@ -270,9 +274,10 @@ def run():
         )
         yield finding(
             "P5",
-            "q-adic depth sees only the shared prefix: it equals the shared-"
-            "attribute count for exactly 121/256 of pairs, where a VSA bag gets "
-            "them all; the order of the levels is the model",
+            "inside ONE value, q-adic depth sees only the shared prefix: packing "
+            "four attributes into one value matches the shared-attribute count "
+            "for exactly 121/256 of pairs; one attribute per key matches every "
+            "pair (proof 005)",
         )
 
     _roles()

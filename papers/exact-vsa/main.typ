@@ -9,6 +9,7 @@
 #let d002 = json("/reports/002_exact_holistic_operations_data.json")
 #let d003 = json("/reports/003_schema_mode_data.json")
 #let d004 = json("/reports/004_graded_nearness_data.json")
+#let d005 = json("/reports/005_concepts_and_hierarchies_data.json")
 
 #let sec(d, prefix) = d.sections.find(s => s.title.starts-with(prefix))
 #let at-k(s, key, value) = s.rows.find(r => r.at(key) == value)
@@ -53,6 +54,9 @@
 #let s4 = sec(d003, "P4")
 #let g1 = sec(d004, "P1–P4")
 #let g5 = sec(d004, "P5")
+#let c1 = sec(d005, "P1")
+#let c2 = sec(d005, "P2–P3")
+#let c4 = sec(d005, "P4")
 
 #set document(title: "Exact Vector-Symbolic Memory from Partial Fractions", author: "Abdullah Ali")
 #set page(paper: "a4", margin: (x: 2.2cm, y: 2.4cm), numbering: "1")
@@ -132,8 +136,9 @@ decomposition of the sum is unique, and every fact is recoverable.
 - A proof that no exact memory of this kind has a holistic re-binding
   (@sec-rebind).
 - Graded nearness without noise: keys at $q$-adic precision, where one
-  subtraction gives every role's depth of agreement with a probe, and its
-  boundary, similarity that is not a shared prefix (@sec-graded).
+  subtraction gives every role's depth of agreement with a probe or another
+  record; with concepts as keys and hierarchies as digits it covers shared
+  concepts and shared ancestry at once (@sec-graded).
 - An empirical comparison at equal storage against a bipolar VSA, against
   FHRR, and against the exact VSA of Deng and Raviv
   @dengraviv2025histogram, with every number produced by an executable
@@ -308,9 +313,13 @@ $i$ and $j$ with a third agree to depth $min(i, j)$ with each other). It
 means something only if the encoding puts meaning in the low digits: for a
 hierarchy, write the root's choice as the last digit, the next level's as
 the one before, and so on, and the depth becomes the number of shared
-ancestors. Similarity that is not a shared prefix — a red car and a blue
-car share a kind but not a colour — cannot be expressed: the order of the
-levels is the model (@sec-graded-exp).
+ancestors. Inside one value, nearness is necessarily a shared prefix: the
+order of the levels is the model. Across a record it need not be. Give each
+concept (attribute) its own key and let its value be a path in that
+concept's own hierarchy: a red car and a blue car then agree fully at the
+key for _kind_ and to whatever depth the colour hierarchy shares at the key
+for _colour_, and one subtraction reports both. Shared keys are shared
+concepts (a bag), digits are shared ancestry (a tree) (@sec-concepts).
 
 == Re-binding is not holistic <sec-rebind>
 
@@ -497,13 +506,39 @@ $r dot.o r = 1$, and only the whole-record similarity remains.
 
 Every exact depth is right, from one subtraction, at #fmt(at-k(g1, "m", 100).ex_bits)
 bits for 100 roles against MAP's #fmt(at-k(g1, "m", 100).map_bits) bits, and
-MAP's probe query falls to #cell(g1, "m", 100, "map_q1") at 100 roles (@tab-graded). On
-similarity that is not a shared prefix the roles reverse: over all ordered
-pairs of 256 leaves read as four independent attributes, $q$-adic depth
-equals the number of shared attributes for exactly
-#g5.rows.at(0).fraction of them (the pairs whose shared attributes happen
-to form a prefix), while a MAP bag of attribute vectors recovers the count
-for #g5.rows.at(0).bag_ok random pairs.
+MAP's probe query falls to #cell(g1, "m", 100, "map_q1") at 100 roles (@tab-graded). Inside
+one value the prefix shape is binding: packing four independent attributes
+into one value, its depth equals the number of shared attributes for exactly
+#g5.rows.at(0).fraction of all ordered pairs (those whose shared attributes
+happen to form a prefix), while a MAP bag of attribute vectors recovers the
+count for #g5.rows.at(0).bag_ok random pairs. That is a limit of the
+encoding, as the next section shows.
+
+== Concepts and hierarchies <sec-concepts>
+
+The same 256 leaves with one attribute per key: the number of keys agreeing
+at full depth equals the shared-attribute count for
+#c1.rows.at(0).per_key ordered pairs. With $m$ attributes, each a
+hierarchy of 3 levels (branching 3) at its own key, one subtraction gives
+every attribute's depth of agreement:
+
+#datatable(
+  c2,
+  ("m", "exact", "ex_bits", "map_acc", "map_bits", "same_acc"),
+  ("attributes m", "exact: every depth", "exact bits", "MAP (n=10⁴)", "MAP bits", "MAP same bits"),
+  [Bag and tree nearness together: per-attribute depth of agreement between two records. MAP compares each attribute after a clean-up against that attribute's 27 leaves.],
+) <tab-concepts>
+
+MAP matches the exact depths at $n = "10,000"$ with a clean-up per role,
+using #fmt(at-k(c2, "m", 64).map_bits) bits against the exact record's
+#fmt(at-k(c2, "m", 64).ex_bits) at 64 attributes (@tab-concepts).
+
+Which concept gets which prime is a coding choice. With frequent concepts
+on the smallest primes, sparse records (1,000 concepts, concept $i$
+present with probability $1\/(i+1)$) take #cell(c4, "order", "frequency", "vs_random")
+the bits of a random assignment, and the reverse order
+#cell(c4, "order", "reversed", "vs_random"): frequent concepts get the cheapest keys, as a
+Huffman code gives frequent symbols the shortest words.
 
 = Limitations <sec-limits>
 
@@ -516,10 +551,10 @@ for #g5.rows.at(0).bag_ok random pairs.
 - *Keys are primes and bound values.* Symbols need a prime dictionary
   (composite keys break closure under addition, @sec-memory), and values
   must be smaller than every key that may hold them.
-- *Nearness only along a hierarchy.* Atoms are not similarity-preserving.
-  Graded nearness exists for prefix-shaped similarity (@sec-graded), not
-  for overlapping attributes, where a VSA bag is right and $q$-adic depth
-  is not.
+- *Nearness is structured, not geometric.* Atoms are not
+  similarity-preserving. Nearness is shared concepts (keys) and shared
+  ancestry (prefixes within a value, @sec-graded); similarity that is
+  neither — learned or continuous, as in an embedding — is outside it.
 - *What is new is narrow.* The algebra (partial fractions, the CRT,
   prime-product sets) is classical, and the secure lock already stores
   values this way. Our contribution is the VSA interface — superposition,
@@ -533,15 +568,15 @@ reduced fraction gives exact recall, exact absence, and merge and delete as
 arithmetic, at about 1.3× the information floor — or at the floor itself
 when the key set is known and only the numerator is kept; its denominator turns
 value queries, analogy and role agreement into one subtraction each, and
-with $q$-adic precision it grades nearness along a hierarchy, though not
-across overlapping attributes. It does not re-bind holistically, and cannot. Against VSAs at equal storage, the
+with $q$-adic precision it grades nearness, exactly, over shared concepts
+and shared ancestry at once. It does not re-bind holistically, and cannot. Against VSAs at equal storage, the
 noisy ones fail and the exact one costs orders of magnitude more, buying
 noise tolerance. The practical question this leaves is the one a dictionary
 never asks: which applications want VSA-style operations _and_ exactness —
 symbolic reasoning over small structured records is the natural candidate.
 
 *Reproducibility.* The library (`rhind.memory`), the proofs
-(001–004) and their data files are in the accompanying repository;
+(001–005) and their data files are in the accompanying repository;
 rerunning a proof regenerates its report and data, and recompiling this
 document regenerates every table.
 

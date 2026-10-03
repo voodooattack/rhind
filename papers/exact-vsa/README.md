@@ -9,10 +9,11 @@ proofs' data files:
 - `reports/002_exact_holistic_operations_data.json`
 - `reports/003_schema_mode_data.json`
 - `reports/004_graded_nearness_data.json`
+- `reports/005_concepts_and_hierarchies_data.json`
 
 These are written by `proofreport` beside each report. To refresh:
 
-1. Re-run proofs 001–004 inside devenv (`uv run -m proofs`).
+1. Re-run proofs 001–005 inside devenv (`uv run -m proofs`).
 2. From the repository root: `typst compile --root . papers/exact-vsa/main.typ`
 
 Open items before submission:

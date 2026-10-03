@@ -91,7 +91,7 @@
    ]
   },
   {
-   "title": "P5 — the boundary: similarity that is not a shared prefix",
+   "title": "P5 — inside one value, nearness is a shared prefix",
    "headers": [
     "pairs",
     "prefix_ok",
@@ -100,7 +100,7 @@
    ],
    "labels": [
     "ordered pairs",
-    "q-adic depth = shared attributes",
+    "one value: depth = shared attributes",
     "as a fraction",
     "MAP-I bag (n=10,000)"
    ],
@@ -118,7 +118,7 @@
    "findings": [
     {
      "label": "P5",
-     "value": "q-adic depth sees only the shared prefix: it equals the shared-attribute count for exactly 121/256 of pairs, where a VSA bag gets them all; the order of the levels is the model"
+     "value": "inside ONE value, q-adic depth sees only the shared prefix: packing four attributes into one value matches the shared-attribute count for exactly 121/256 of pairs; one attribute per key matches every pair (proof 005)"
     }
    ]
   }
