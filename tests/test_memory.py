@@ -192,8 +192,9 @@ def test_holding_with_empty_roles_in_the_bag():
 
 
 def test_composite_keys_are_refused():
-    """Each failure mode of a composite key (see build's docstring) is refused
-    at the door rather than stored as a wrong memory."""
+    """Keys mixing different primes (15, 6 and 10) are refused at the door
+    rather than stored as a wrong memory. Prime powers (9) and 1 are refused
+    because this class treats keys atomically; rhind.adic covers precision."""
     for facts in ({15: 5, 7: 3}, {15: 4}, {6: 1, 10: 1}, {9: 2}, {1: 0}):
         with pytest.raises(ValueError, match="not prime"):
             ExactMemory.build(facts)

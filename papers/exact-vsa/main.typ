@@ -204,8 +204,11 @@ closure. With the key $15$, two admissible facts sum to an inadmissible
 one, $4\/15 + 1\/15 = 1\/3$, and the key collapses into a phantom key $3$;
 a non-unit value $5\/15 = 1\/3$ does the same directly. Keys sharing a
 factor alias outright: $1\/6 + 1\/10 = 4\/15 = 2\/3 + 3\/5$, so two
-different memories have the same fraction. Prime keys are the only choice
-for which every nonzero value keeps its key in the denominator.
+different memories have the same fraction. What fails is a key mixing
+different primes. A prime power is sound ($5\/25 = 1\/5$ keeps the prime
+$5$ and records how many base-$5$ digits of the value are zero); that is
+the starting point of graded nearness, which we leave to future work. We
+use prime keys throughout.
 
 *Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
 bits. With keys the primes above the value range, this is about

@@ -57,10 +57,14 @@ class ExactMemory:
     def build(cls, facts: dict) -> "ExactMemory":
         """{prime key q: value 1 ≤ v < q} → memory.
 
-        Keys must be prime. A composite key breaks the construction: a value
-        sharing a factor with it collapses the key (5/15 = 1/3), two valid
-        values can sum to such a value (4/15 + 1/15 = 1/3), and keys sharing
-        a factor alias (1/6 + 1/10 = 4/15 = 2/3 + 3/5). Primality is checked
+        Keys must be prime. A key mixing different primes breaks the
+        construction: a value sharing a factor with it collapses the key
+        (5/15 = 1/3), two valid values can sum to such a value
+        (4/15 + 1/15 = 1/3), and keys sharing a factor alias
+        (1/6 + 1/10 = 4/15 = 2/3 + 3/5). Prime POWERS are sound (5/25 = 1/5
+        keeps the prime 5 and records q-adic depth), but this class treats a
+        key as one atomic number, so it refuses them too; rhind.adic handles
+        keys at q-adic precision. Primality is checked
         with deterministic Miller–Rabin (exact below 3.3·10²⁴; a strong
         probable-prime test above that).
 
