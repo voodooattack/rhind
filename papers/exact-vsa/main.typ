@@ -180,6 +180,18 @@ their characteristic polynomials. Our key bag $S = sum 1\/q$ is the integer
 analogue of the logarithmic derivative $chi'\/chi = sum 1\/(z - a)$ of a
 characteristic polynomial $chi$.
 
+*p-adic and ultrametric representations.* Encoding a hierarchy as p-adic
+digit strings, so that shared ancestry becomes a long common prefix and the
+Baire metric $r^(-beta)$ measures it, is established: Murtagh
+@murtagh2016padic uses it for clustering dendrograms and replaces sparsity
+by the p-adic norm, and Martins @martins2025padics develops classification,
+regression and representation learning over $QQ_p$, including Quillian
+semantic networks as compact p-adic linear networks. Our graded nearness
+(@sec-graded) uses the same ultrametric. What differs is where it is read:
+inside a superposed memory, where one subtraction returns the depth for
+every key at once. Neither line of work involves superposition or a
+key–value memory.
+
 = The memory <sec-memory>
 
 Fix a set of _keys_: distinct primes. A _fact_ is a pair $(q, v)$ with $q$ a
@@ -556,10 +568,11 @@ Huffman code gives frequent symbols the shortest words.
   ancestry (prefixes within a value, @sec-graded); similarity that is
   neither — learned or continuous, as in an embedding — is outside it.
 - *What is new is narrow.* The algebra (partial fractions, the CRT,
-  prime-product sets) is classical, and the secure lock already stores
-  values this way. Our contribution is the VSA interface — superposition,
-  unbinding, holistic queries — as rational arithmetic, its proofs, and the
-  measured comparison.
+  prime-product sets, p-adic encodings of hierarchies) is classical, and the
+  secure lock already stores values this way. Our contribution is the VSA
+  interface — superposition, unbinding, holistic queries and graded
+  nearness — as rational arithmetic, its proofs, and the measured
+  comparison.
 
 = Conclusion
 

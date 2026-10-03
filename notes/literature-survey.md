@@ -163,6 +163,33 @@ Tested in a banana-lab exploration (not carried over) and rejected, correctly.
   `χ'/χ = Σ 1/(z − a)` of their characteristic polynomial. Our tie at
   744 vs 737 bits is what that analogy predicts.
 
+## 6. Graded nearness (proofs 004, 005), added 2026-10-03
+
+Claim: with keys at q-adic precision, one subtraction returns every key's
+depth of agreement (shared trailing base-q digits); with concepts as keys
+and hierarchies as digits, that covers shared concepts and shared ancestry
+at once.
+
+**Verdict for the ultrametric: known in a different form.** Encoding a
+hierarchy as p-adic digit strings, with longest-common-prefix (Baire)
+distance as the hierarchical metric, is established. Murtagh (2016) codes
+clustering dendrograms this way and uses the p-adic norm as the sparsity
+criterion; Martins (2025) builds classification, regression and
+representation learning over ℚ_p, encoding Quillian semantic networks as
+compact p-adic linear networks. Neither involves superposition, a
+key–value memory or the CRT.
+
+**Verdict for reading it inside a superposed memory: apparently new.**
+The per-key depth comes from the exponent of each prime in one reduced
+denominator, den(F − P), the same denominator-drop mechanism as the value
+query of §3, extended from equality to graded agreement. As with §3, it is
+short once stated.
+
+**Concepts as keys with frequent concepts on small primes (005, P4): known
+in a different form.** That frequent symbols should get the cheapest codes
+is Huffman's principle (and the rearrangement inequality); banana-lab's
+proof 128 used the same frequency order for gcd similarity.
+
 ## Summary
 
 | Claim | Verdict |
@@ -173,6 +200,9 @@ Tested in a banana-lab exploration (not carried over) and rejected, correctly.
 | holding / agreeing via denominator drop (002) | apparently new, shallow |
 | Exact analogy (002) | known in a different form (dictionary + reverse index) |
 | Re-binding must read (002) | known (textbook Hom) |
+| Graded nearness: p-adic hierarchy encoding (004) | known in a different form (Murtagh 2016; Martins 2025) |
+| Graded nearness: every key's depth from one denominator (004, 005) | apparently new, shallow |
+| Frequent concepts on small primes (005) | known in a different form (Huffman; proof 128) |
 | Set sync | known (CPI); we tie it |
 
 Bottom line: the lab has an exact, self-describing CRT dictionary whose VSA
@@ -194,3 +224,5 @@ FHRR (proof 001) and Deng & Raviv (exploration 040).
 - [Kleyko et al., HDC/VSA survey part II (ACM CSUR)](https://dl.acm.org/doi/10.1145/3558000)
 - [Schlegel et al., A comparison of VSAs](https://link.springer.com/article/10.1007/s10462-021-10110-3)
 - [Minsky, Trachtenberg & Zippel, set reconciliation (ADS)](https://ui.adsabs.harvard.edu/abs/2003ITIT...49.2213M/abstract)
+- [Murtagh, Sparse p-adic data coding (arXiv 1604.06961)](https://research.gold.ac.uk/18816/1/1604.06961v1.pdf)
+- [Martins, Learning with the p-adics (arXiv 2512.22692)](https://arxiv.org/abs/2512.22692)
