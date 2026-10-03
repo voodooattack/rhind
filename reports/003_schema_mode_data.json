@@ -1,0 +1,148 @@
+{
+ "title": "003 — Schema mode: with a predictable key set, store N alone",
+ "sections": [
+  {
+   "title": "P1–P3 — full records: round trip, size, operations",
+   "headers": [
+    "m",
+    "round_trip",
+    "n_bits",
+    "floor",
+    "ratio",
+    "frac_bits",
+    "frac_ratio",
+    "merge",
+    "holding"
+   ],
+   "labels": [
+    "roles m",
+    "round trip",
+    "N bits (max)",
+    "floor",
+    "÷ floor",
+    "fraction mode bits",
+    "÷ schema",
+    "merge exact",
+    "holding exact"
+   ],
+   "legend": {
+    "floor": "m·⌈log₂ V⌉ bits, V = 1,000",
+    "frac_bits": "N and D stored, as in proof 001",
+    "holding": "every x = 1, 38, 75, …; records include empty roles"
+   },
+   "rows": [
+    {
+     "m": 10,
+     "round_trip": "200/200",
+     "n_bits": 101,
+     "floor": 100,
+     "ratio": "1.01×",
+     "frac_bits": 202,
+     "frac_ratio": "2.00×",
+     "merge": "yes",
+     "holding": "yes"
+    },
+    {
+     "m": 100,
+     "round_trip": "200/200",
+     "n_bits": 1039,
+     "floor": 1000,
+     "ratio": "1.03×",
+     "frac_bits": 2078,
+     "frac_ratio": "2.00×",
+     "merge": "yes",
+     "holding": "yes"
+    },
+    {
+     "m": 1000,
+     "round_trip": "200/200",
+     "n_bits": 12090,
+     "floor": 10000,
+     "ratio": "1.20×",
+     "frac_bits": 24180,
+     "frac_ratio": "2.00×",
+     "merge": "yes",
+     "holding": "yes"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P1–P3",
+     "value": "with the key set known, N alone round-trips every record at 1.01× the information floor for 10 roles and 1.20× for 1,000, half of fraction mode; merge and the value query survive"
+    }
+   ]
+  },
+  {
+   "title": "P4 — sparse key sets: the cheapest encoding of the keys",
+   "headers": [
+    "K",
+    "d_bits",
+    "gamma_bits",
+    "bitmap_bits",
+    "best"
+   ],
+   "labels": [
+    "keys K",
+    "D",
+    "γ gaps",
+    "bitmap",
+    "cheapest"
+   ],
+   "legend": {
+    "d_bits": "the product of the keys, as fraction mode stores it",
+    "gamma_bits": "Elias-γ codes of the gaps between dictionary positions",
+    "bitmap_bits": "one presence bit per dictionary entry (U = 20,000)"
+   },
+   "rows": [
+    {
+     "K": 10,
+     "d_bits": 156,
+     "gamma_bits": 194,
+     "bitmap_bits": 20000,
+     "best": "D"
+    },
+    {
+     "K": 100,
+     "d_bits": 1620,
+     "gamma_bits": 1324,
+     "bitmap_bits": 20000,
+     "best": "γ gaps"
+    },
+    {
+     "K": 300,
+     "d_bits": 4854,
+     "gamma_bits": 3176,
+     "bitmap_bits": 20000,
+     "best": "γ gaps"
+    },
+    {
+     "K": 1000,
+     "d_bits": 16311,
+     "gamma_bits": 7470,
+     "bitmap_bits": 20000,
+     "best": "γ gaps"
+    },
+    {
+     "K": 3000,
+     "d_bits": 48744,
+     "gamma_bits": 14184,
+     "bitmap_bits": 20000,
+     "best": "γ gaps"
+    },
+    {
+     "K": 10000,
+     "d_bits": 162632,
+     "gamma_bits": 22738,
+     "bitmap_bits": 20000,
+     "best": "bitmap"
+    }
+   ],
+   "findings": [
+    {
+     "label": "P4",
+     "value": "D is the cheapest key-set encoding only for very sparse memories (10 keys of 20,000); a gap code wins from about 100 keys, a bitmap when nearly half the dictionary is present"
+    }
+   ]
+  }
+ ]
+}

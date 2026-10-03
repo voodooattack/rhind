@@ -39,6 +39,7 @@
     rhind_tests.exec = "uv run pytest";
     rhind_proofs.exec = "uv run -m proofs";
     rhind_paper.exec = "typst compile --root . papers/exact-vsa/main.typ";
+    rhind_build.exec = "rhind_tests && rhind_proofs && rhind_paper";
   };
 
   enterTest = ''

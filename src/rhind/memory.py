@@ -55,8 +55,20 @@ class ExactMemory:
 
     @classmethod
     def build(cls, facts: dict) -> "ExactMemory":
-        """{prime key q: value 1 ≤ v < q} → memory."""
+        """{prime key q: value 1 ≤ v < q} → memory.
+
+        Keys must be prime. A composite key breaks the construction: a value
+        sharing a factor with it collapses the key (5/15 = 1/3), two valid
+        values can sum to such a value (4/15 + 1/15 = 1/3), and keys sharing
+        a factor alias (1/6 + 1/10 = 4/15 = 2/3 + 3/5). Primality is checked
+        with deterministic Miller–Rabin (exact below 3.3·10²⁴; a strong
+        probable-prime test above that).
+
+        `ExactMemory(F)` itself trusts its argument: checking an arbitrary
+        fraction would mean factoring its denominator."""
         for q, v in facts.items():
+            if not is_prime(q):
+                raise ValueError(f"key {q} is not prime")
             if not 0 < v < q:
                 raise ValueError(f"value {v} for key {q} must lie in 1 … {q - 1}")
         D = prod(facts) if facts else 1
@@ -128,10 +140,18 @@ class ExactMemory:
 
     def holding(self, x: int, bag: "ExactMemory") -> int:
         """Product of the keys whose value is x (1 if none), in one subtraction.
-        `bag` must be this memory's key bag; x must lie below every key."""
+
+        `bag` is the key bag of the roles to search; it may name keys this
+        memory leaves empty (value 0). x must lie below every key.
+
+        Every key of the bag or the memory with a value other than x stays in
+        den(F − x·S) (an empty role contributes −x/q); the keys holding x
+        vanish. So the answer is lcm(D, D_bag) / den(F − x·S). Dividing D
+        alone is wrong as soon as the bag names an empty role."""
         if x <= 0:
             raise ValueError("values are positive")
-        return self.D // _den(self.F - x * bag.F)
+        both = self.D // gcd(self.D, bag.D) * bag.D
+        return both // _den(self.F - x * bag.F)
 
     def analogy(self, other: "ExactMemory", x: int, bag: "ExactMemory"):
         """'The x of self': self's value at the key where `other` holds x, or
@@ -147,6 +167,8 @@ class ExactMemory:
     def rebind(self, q_old: int, q_new: int) -> "ExactMemory":
         """Move the value at q_old to q_new (read, then write: no holistic
         form exists). The value must lie below q_new."""
+        if not is_prime(q_new):
+            raise ValueError(f"key {q_new} is not prime")
         v = self.get(q_old)
         if v is None:
             raise KeyError(q_old)

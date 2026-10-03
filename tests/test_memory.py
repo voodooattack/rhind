@@ -172,3 +172,34 @@ def test_rebind_moves_one_value_and_nothing_else():
         assert moved == ExactMemory.build(want)
     with pytest.raises(KeyError):
         ExactMemory.build({KEYS[0]: 2}).rebind(KEYS[1], spare)
+
+
+def test_holding_with_empty_roles_in_the_bag():
+    """A schema bag may name roles a record leaves empty (value 0): those
+    roles hold 0, not x, and must not corrupt the answer."""
+    rng = random.Random(41)
+    keys = DIC.primes[:200]
+    bag = ExactMemory.key_bag(keys)
+    for _ in range(300):
+        vals = {q: rng.choice([0, 0, rng.randrange(1, V)]) for q in keys}
+        mem = ExactMemory.build({q: v for q, v in vals.items() if v})
+        x = rng.randrange(1, V)
+        truth = 1
+        for q, v in vals.items():
+            if v == x:
+                truth *= q
+        assert mem.holding(x, bag) == truth
+
+
+def test_composite_keys_are_refused():
+    """Each failure mode of a composite key (see build's docstring) is refused
+    at the door rather than stored as a wrong memory."""
+    for facts in ({15: 5, 7: 3}, {15: 4}, {6: 1, 10: 1}, {9: 2}, {1: 0}):
+        with pytest.raises(ValueError, match="not prime"):
+            ExactMemory.build(facts)
+    with pytest.raises(ValueError, match="not prime"):
+        ExactMemory.key_bag([1009, 1011])  # 1011 = 3 · 337
+    mem = ExactMemory.build({1009: 42})
+    with pytest.raises(ValueError, match="not prime"):
+        mem.rebind(1009, 1015)  # 1015 = 5 · 7 · 29
+    assert mem.rebind(1009, 1013).get(1013) == 42

@@ -7,6 +7,7 @@
 
 #let d001 = json("/reports/001_exact_memory_vs_noisy_vsa_data.json")
 #let d002 = json("/reports/002_exact_holistic_operations_data.json")
+#let d003 = json("/reports/003_schema_mode_data.json")
 
 #let sec(d, prefix) = d.sections.find(s => s.title.starts-with(prefix))
 #let at-k(s, key, value) = s.rows.find(r => r.at(key) == value)
@@ -47,6 +48,8 @@
 #let m4 = sec(d001, "P4")
 #let h1 = sec(d002, "P1–P4")
 #let h5 = sec(d002, "P5")
+#let s1 = sec(d003, "P1–P3")
+#let s4 = sec(d003, "P4")
 
 #set document(title: "Exact Vector-Symbolic Memory from Partial Fractions", author: "Abdullah Ali")
 #set page(paper: "a4", margin: (x: 2.2cm, y: 2.4cm), numbering: "1")
@@ -85,7 +88,8 @@
   value in one subtraction, exact analogy, and the set of agreeing roles of
   two records — and a proof that exact re-binding cannot be holistic,
   because $"Hom"(ZZ\/p, ZZ\/q) = 0$. The memory costs about 1.3× the
-  information floor. At equal storage the strongest dense VSA (FHRR) is no
+  information floor, and when the key set is known in advance a numerator
+  alone suffices, at #cell(s1, "m", 10, "ratio") the floor for a ten-role record. At equal storage the strongest dense VSA (FHRR) is no
   better than a bipolar one, and the closest published exact VSA needs
   #cell(m7, "K", 10, "ratio") to #cell(m7, "K", 3000, "ratio") the bits, in exchange for noise tolerance that ours
   lacks. Every number is produced by executable proofs.
@@ -117,7 +121,9 @@ decomposition of the sum is unique, and every fact is recoverable.
 - An exact key–value memory $F = sum v_q \/ q mod 1$ with one-step recall,
   detection of absent keys, and merge and delete as $+$ and $-$
   (@sec-memory). We identify it with the Chinese-remainder secure lock
-  @chiou1989lock and state what the fraction form adds.
+  @chiou1989lock and state what the fraction form adds, why the keys must
+  be prime, and a _schema mode_ that drops the denominator when the key set
+  is predictable.
 - Exact holistic operations: all keys holding a value, analogy, and agreeing
   roles, each by one subtraction and a denominator (@sec-holistic).
 - A proof that no exact memory of this kind has a holistic re-binding
@@ -190,6 +196,17 @@ $F plus.minus v\/q$; two memories over disjoint keys merge by $F_A + F_B$;
 two memories that disagree on a key are detected by $gcd(D_A, D_B) > 1$.
 Projecting onto a subset $R subset Q$ is one CRT step.
 
+*Why primes.* Memories over prime keys form the group
+$plus.o.big_q ZZ\/q$, so every sum and difference is again a valid
+memory: values at a shared key add modulo $q$, and a value reaching $0$
+removes its key cleanly. Pairwise-coprime composite keys do not have this
+closure. With the key $15$, two admissible facts sum to an inadmissible
+one, $4\/15 + 1\/15 = 1\/3$, and the key collapses into a phantom key $3$;
+a non-unit value $5\/15 = 1\/3$ does the same directly. Keys sharing a
+factor alias outright: $1\/6 + 1\/10 = 4\/15 = 2\/3 + 3\/5$, so two
+different memories have the same fraction. Prime keys are the only choice
+for which every nonzero value keeps its key in the denominator.
+
 *Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
 bits. With keys the primes above the value range, this is about
 #cell(m1, "K", 1000, "ratio") the size of an ideally packed table of
@@ -202,22 +219,44 @@ come from carrying the fraction rather than the integer. The modulus
 travels with the value, so merge is plain addition rather than a CRT
 recombination; and membership is read from $D$.
 
+*Schema mode.* Most of the overhead above is $D$ itself: $N$ and $D$ have
+about the same length. When the key set is known in advance — a record
+whose roles are always the same primes, for instance the first $m$ primes
+above the value range — $D$ can be recomputed and only $N$ stored. That is
+the secure-lock integer again, and it gives up reading absence from the
+memory: that knowledge moves to the schema. In exchange the record costs
+#cell(s1, "m", 10, "ratio") the information floor at $m = 10$ roles and
+#cell(s1, "m", 1000, "ratio") at $m = "1,000"$, half of the fraction form,
+while merge ($N_1 + N_2 mod D$) and the value query of @sec-holistic still
+work (@sec-schema). For sparse memories over a known dictionary, $D$ is
+itself a key-set encoding, and the cheapest one only when very sparse
+(@tab-sparse).
+
 = Holistic operations <sec-holistic>
 
-Let $S = sum_(q in Q) 1\/q$ be the _key bag_ of $Q$. For records that share
-a key set (a schema of roles), one $S$ serves them all.
+Let $S = sum_(q in R) 1\/q$ be the _key bag_ of a set of roles $R$, with
+denominator $D_R = product_(q in R) q$. For records that share a schema of
+roles, one $S$ serves them all, including records that leave some roles
+empty ($v_q = 0$ for $q in R without Q$).
 
 #theorem("Proposition 2 (value query)")[
-  For an integer $x$ with $1 <= x < min Q$,
-  $"den"(F - x S) = product_(q in Q, v_q != x) q$.
-  Hence the keys holding $x$ are the prime factors of $D \/ "den"(F - x S)$.
+  For an integer $x$ with $1 <= x < min(Q union R)$,
+  $"den"(F - x S) = product_(q in Q union R, v_q != x) q$.
+  Hence the keys holding $x$ are the prime factors of
+  $"lcm"(D, D_R) \/ "den"(F - x S)$.
 ]
 #proof[
-  $F - x S equiv sum_q (v_q - x)\/q$. Terms with $v_q = x$ vanish. Otherwise
-  $0 < |v_q - x| < q$, so the term has exact denominator $q$, and by the
-  argument of Proposition 1 the denominator of the sum is the product of
-  those $q$.
+  $F - x S equiv sum_(q in Q union R) (v_q - x)\/q$, with $v_q = 0$ off
+  $Q$ and the $x$-term absent off $R$. Terms with $v_q = x$ vanish.
+  Otherwise $0 < |v_q - x| < q$, so the term has exact denominator $q$, and
+  by the argument of Proposition 1 the denominator of the sum is the
+  product of those $q$.
 ]
+
+An empty role keeps its prime in $"den"(F - x S)$ through the term $-x\/q$,
+although that prime is not in $D$; dividing $D$ alone is then wrong, which
+is why the statement uses $"lcm"(D, D_R)$. (Our first schema-mode
+experiment found exactly this error in an earlier version of the library.)
 
 One subtraction thus subtracts $x$ from every value at once, and the matches
 drop out of the denominator. Two operations follow directly.
@@ -370,6 +409,35 @@ mapping vector carries $m^2$ cross terms, so its analogy accuracy falls from
 $m = 100$, while using #fmt(at-k(h1, "m", 100).map_bits) bits against the
 exact record's #fmt(at-k(h1, "m", 100).ex_bits).
 
+== Schema mode <sec-schema>
+
+Records have $m$ roles, the first $m$ primes above $V = "1,000"$, with values
+$0 <= v < V$ ($0$ an empty role); 200 records per $m$. Only $N$ is stored;
+$D$ is recomputed from the schema. The floor is $m ceil(log_2 V)$ bits.
+
+#datatable(
+  s1,
+  ("m", "round_trip", "n_bits", "floor", "ratio", "frac_bits", "frac_ratio", "merge", "holding"),
+  ("roles m", "round trip", "N bits", "floor", "÷ floor", "fraction bits", "÷ schema", "merge", "holding"),
+  [Schema mode: exact round trip, size against the floor and against storing $N$ and $D$, and the operations.],
+) <tab-schema>
+
+For a sparse memory over a known dictionary of $U = "20,000"$ entries, the key
+set can be stored as $D$, as Elias-γ codes of the gaps between dictionary
+positions, or as a presence bitmap:
+
+#datatable(
+  s4,
+  ("K", "d_bits", "gamma_bits", "bitmap_bits", "best"),
+  ("keys K", "D", "γ gaps", "bitmap", "cheapest"),
+  [Bits to store which $K$ keys are present.],
+) <tab-sparse>
+
+$D$ wins only at #at-k(s4, "best", "D").K keys; a gap code wins from about
+100 keys and a bitmap once half the dictionary is present (@tab-sparse). So
+the fraction form's self-description costs little in very sparse memories
+and should be traded for a schema or an index code in dense ones.
+
 = Limitations <sec-limits>
 
 - *No noise tolerance.* One flipped bit of $N$ or $D$ corrupts the whole
@@ -378,8 +446,9 @@ exact record's #fmt(at-k(h1, "m", 100).ex_bits).
 - *Query cost grows with the memory.* Recall reduces an integer of
   $approx 2 sum log_2 q$ bits modulo $q$: linear in the memory's size, not
   constant like a hash table.
-- *Keys are primes and bound values.* Symbols need a prime dictionary, and
-  values must be smaller than every key that may hold them.
+- *Keys are primes and bound values.* Symbols need a prime dictionary
+  (composite keys break closure under addition, @sec-memory), and values
+  must be smaller than every key that may hold them.
 - *No similarity between values.* Atoms are not similarity-preserving; the
   memory answers equality, not nearness.
 - *What is new is narrow.* The algebra (partial fractions, the CRT,
@@ -392,7 +461,8 @@ exact record's #fmt(at-k(h1, "m", 100).ex_bits).
 
 Superposition does not have to be noisy. Writing a key–value memory as one
 reduced fraction gives exact recall, exact absence, and merge and delete as
-arithmetic, at about 1.3× the information floor; its denominator turns
+arithmetic, at about 1.3× the information floor — or at the floor itself
+when the key set is known and only the numerator is kept; its denominator turns
 value queries, analogy and role agreement into one subtraction each. It does
 not re-bind holistically, and cannot. Against VSAs at equal storage, the
 noisy ones fail and the exact one costs orders of magnitude more, buying
@@ -401,7 +471,7 @@ never asks: which applications want VSA-style operations _and_ exactness —
 symbolic reasoning over small structured records is the natural candidate.
 
 *Reproducibility.* The library (`rhind.memory`), the proofs
-(001, 002) and their data files are in the accompanying repository;
+(001–003) and their data files are in the accompanying repository;
 rerunning a proof regenerates its report and data, and recompiling this
 document regenerates every table.
 
