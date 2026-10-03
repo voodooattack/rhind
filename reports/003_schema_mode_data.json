@@ -18,15 +18,15 @@
     "roles m",
     "round trip",
     "N bits (max)",
-    "floor",
-    "÷ floor",
+    "packed",
+    "÷ packed",
     "fraction mode bits",
     "÷ schema",
-    "merge exact",
+    "merge (disjoint) exact",
     "holding exact"
    ],
    "legend": {
-    "floor": "m·⌈log₂ V⌉ bits, V = 1,000",
+    "floor": "packed size m·⌈log₂ V⌉ bits, V = 1,000",
     "frac_bits": "N and D stored, as in proof 001",
     "holding": "every x = 1, 38, 75, …; records include empty roles"
    },
@@ -68,7 +68,7 @@
    "findings": [
     {
      "label": "P1–P3",
-     "value": "with the key set known, N alone round-trips every record at 1.01× the information floor for 10 roles and 1.20× for 1,000, half of fraction mode; merge and the value query survive"
+     "value": "with the key set known, N alone round-trips every record at 1.01× the packed size m·⌈log₂ V⌉ for 10 roles and 1.20× for 1,000, half of fraction mode; merge of disjoint records and the value query survive"
     }
    ]
   },
@@ -96,43 +96,43 @@
    "rows": [
     {
      "K": 10,
-     "d_bits": 156,
-     "gamma_bits": 194,
+     "d_bits": 171,
+     "gamma_bits": 204,
      "bitmap_bits": 20000,
      "best": "D"
     },
     {
      "K": 100,
      "d_bits": 1620,
-     "gamma_bits": 1324,
+     "gamma_bits": 1370,
      "bitmap_bits": 20000,
      "best": "γ gaps"
     },
     {
      "K": 300,
-     "d_bits": 4854,
-     "gamma_bits": 3176,
+     "d_bits": 4896,
+     "gamma_bits": 3162,
      "bitmap_bits": 20000,
      "best": "γ gaps"
     },
     {
      "K": 1000,
-     "d_bits": 16311,
-     "gamma_bits": 7470,
+     "d_bits": 16256,
+     "gamma_bits": 7510,
      "bitmap_bits": 20000,
      "best": "γ gaps"
     },
     {
      "K": 3000,
-     "d_bits": 48744,
-     "gamma_bits": 14184,
+     "d_bits": 48781,
+     "gamma_bits": 14178,
      "bitmap_bits": 20000,
      "best": "γ gaps"
     },
     {
      "K": 10000,
-     "d_bits": 162632,
-     "gamma_bits": 22738,
+     "d_bits": 162606,
+     "gamma_bits": 22770,
      "bitmap_bits": 20000,
      "best": "bitmap"
     }

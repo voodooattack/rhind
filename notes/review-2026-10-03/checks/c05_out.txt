@@ -1,0 +1,6 @@
+ m= 10 n=10000: analogy one-shot 100/100, two-step 100/100; agreeing count one-shot 100/100, agreeing SET via per-role clean-up 100/100
+ m= 10 n= 2000: analogy one-shot 86/100, two-step 100/100; agreeing count one-shot 95/100, agreeing SET via per-role clean-up 100/100
+ m= 30 n=10000: analogy one-shot 43/100, two-step 100/100; agreeing count one-shot 90/100, agreeing SET via per-role clean-up 100/100
+ m= 30 n= 2000: analogy one-shot 1/100, two-step 100/100; agreeing count one-shot 49/100, agreeing SET via per-role clean-up 100/100
+ m=100 n=10000: analogy one-shot 0/100, two-step 100/100; agreeing count one-shot 35/100, agreeing SET via per-role clean-up 100/100
+ m=100 n= 2000: analogy one-shot 0/100, two-step 94/100; agreeing count one-shot 19/100, agreeing SET via per-role clean-up 11/100

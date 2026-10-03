@@ -94,9 +94,10 @@
   queries that VSAs answer only approximately — every key holding a given
   value in one subtraction, exact analogy, and the set of agreeing roles of
   two records — and a proof that exact re-binding cannot be holistic,
-  because $"Hom"(ZZ\/p, ZZ\/q) = 0$. The memory costs about 1.3× the
-  information floor, and when the key set is known in advance a numerator
-  alone suffices, at #cell(s1, "m", 10, "ratio") the floor for a ten-role record. At equal storage the strongest dense VSA (FHRR) is no
+  because $"Hom"(ZZ\/p, ZZ\/q) = 0$. The memory costs about 1.3× an
+  ideally packed table (#cell(m1, "K", 10, "set_ratio") to #cell(m1, "K", 3000, "set_ratio") the information-theoretic
+  minimum for an unordered set of facts), and when the key set is known in
+  advance a numerator alone suffices, at #cell(s1, "m", 10, "ratio") the packed size of a ten-role record. At equal storage the strongest dense VSA (FHRR) is no
   better than a bipolar one, and the closest published exact VSA needs
   #cell(m7, "K", 10, "ratio") to #cell(m7, "K", 3000, "ratio") the bits, in exchange for noise tolerance that ours
   lacks. Every number is produced by executable proofs.
@@ -215,8 +216,13 @@ $ F = sum_(q in Q) v_q / q mod 1 = N / D, quad gcd(N, D) = 1, quad 0 <= N < D. $
 Recall is therefore one multiplication and one reduction modulo $q$.
 A key $p$ is _absent_ exactly when $p divides.not D$, so the memory answers
 "not stored" without false positives. Facts are added and removed by
-$F plus.minus v\/q$; two memories over disjoint keys merge by $F_A + F_B$;
-two memories that disagree on a key are detected by $gcd(D_A, D_B) > 1$.
+$F plus.minus v\/q$, and a fact is removed by subtracting its exact value,
+so deletion is read-then-subtract. Two memories over disjoint keys merge by
+$F_A + F_B$. Merge is per-key addition modulo $q$, not a union: at a shared
+key the values add ($A + A$ doubles every value, and values summing to $q$
+remove the key), so $gcd(D_A, D_B) > 1$ flags keys the two memories
+_share_; which of those hold equal values is the agreeing-roles query of
+@sec-holistic.
 Projecting onto a subset $R subset Q$ is one CRT step.
 
 *Why primes.* Memories over prime keys form the group
@@ -236,7 +242,12 @@ prime keys.
 *Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
 bits. With keys the primes above the value range, this is about
 #cell(m1, "K", 1000, "ratio") the size of an ideally packed table of
-$K (ceil(log_2 U) + ceil(log_2 V))$ bits (@tab-map).
+$K (ceil(log_2 U) + ceil(log_2 V))$ bits (@tab-map). That table is ordered;
+an unordered set of $K$ facts needs only
+$ceil(log_2 (binom(U, K) (V - 1)^K))$ bits, and against that floor the
+memory costs #cell(m1, "K", 10, "set_ratio") at $K = 10$, rising to #cell(m1, "K", 3000, "set_ratio") at
+$K = "3,000"$: it spends about $2 log_2 q$ bits per fact, while the floor per
+fact shrinks as $K$ grows.
 
 *Relation to the secure lock.* Proposition 1 says $N$ solves the system
 $X equiv v_q (D\/q) (mod q)$: the CRT broadcast integer of
@@ -251,9 +262,9 @@ whose roles are always the same primes, for instance the first $m$ primes
 above the value range — $D$ can be recomputed and only $N$ stored. That is
 the secure-lock integer again, and it gives up reading absence from the
 memory: that knowledge moves to the schema. In exchange the record costs
-#cell(s1, "m", 10, "ratio") the information floor at $m = 10$ roles and
+#cell(s1, "m", 10, "ratio") the packed size $m ceil(log_2 V)$ at $m = 10$ roles and
 #cell(s1, "m", 1000, "ratio") at $m = "1,000"$, half of the fraction form,
-while merge ($N_1 + N_2 mod D$) and the value query of @sec-holistic still
+while merge of records with disjoint supports ($N_1 + N_2 mod D$) and the value query of @sec-holistic still
 work (@sec-schema). For sparse memories over a known dictionary, $D$ is
 itself a key-set encoding, and the cheapest one only when very sparse
 (@tab-sparse).
@@ -266,15 +277,18 @@ roles, one $S$ serves them all, including records that leave some roles
 empty ($v_q = 0$ for $q in R without Q$).
 
 #theorem("Proposition 2 (value query)")[
-  For an integer $x$ with $1 <= x < min(Q union R)$,
-  $"den"(F - x S) = product_(q in Q union R, v_q != x) q$.
-  Hence the keys holding $x$ are the prime factors of
+  For an integer $x$ with $1 <= x < min R$,
+  $"den"(F - x S) = product q$ over $q in Q union R$ except the keys
+  $q in R$ with $v_q = x$.
+  Hence the keys of $R$ holding $x$ are the prime factors of
   $"lcm"(D, D_R) \/ "den"(F - x S)$.
 ]
 #proof[
-  $F - x S equiv sum_(q in Q union R) (v_q - x)\/q$, with $v_q = 0$ off
-  $Q$ and the $x$-term absent off $R$. Terms with $v_q = x$ vanish.
-  Otherwise $0 < |v_q - x| < q$, so the term has exact denominator $q$, and
+  $F - x S equiv sum_(q in Q union R) (v_q - x [q in R])\/q$, with $v_q = 0$
+  off $Q$. For $q in R$ the term vanishes when $v_q = x$; otherwise
+  $0 < |v_q - x| < q$ because $x < q$. For $q in Q without R$ the term is
+  $v_q\/q$ with $0 < v_q < q$, whatever $x$ is: a stored key outside $R$
+  is never reported. Each surviving term has exact denominator $q$, and
   by the argument of Proposition 1 the denominator of the sum is the
   product of those $q$.
 ]
@@ -289,8 +303,11 @@ drop out of the denominator. Two operations follow directly.
 
 *Analogy* — "what is the dollar of Mexico?" @kanerva2010dollar. Given
 records $A$ (Mexico) and $B$ (USA) over the same roles, the role of $x$
-(dollar) in $B$ is $D_B \/ "den"(F_B - x S)$; the answer is $A$'s value at
-that role (Proposition 1). In a VSA the same query unbinds through a mapping
+(dollar) in $B$ is $"lcm"(D_B, D_R) \/ "den"(F_B - x S)$ (Proposition 2;
+the lcm matters when $B$ leaves a role empty); the answer is $A$'s value at
+that role (Proposition 1). The analogy is defined when $x$ sits at exactly
+one role of $B$: the quotient is then a single prime, and otherwise it is
+$1$ or a product, which the query reports as no answer. In a VSA the same query unbinds through a mapping
 vector $A dot.o B$ whose $m^2$ cross terms make it approximate.
 
 *Agreeing roles.* For records $A$, $B$,
@@ -320,8 +337,9 @@ with $nu_q$ the $q$-adic valuation.
 ]
 
 So one subtraction, against a probe record or another record, gives every
-role's depth at once. Depth is an ultrametric (two values agreeing to depth
-$i$ and $j$ with a third agree to depth $min(i, j)$ with each other). It
+role's depth at once. Depth defines an ultrametric, $q^(-j)$ (two values
+agreeing to depths $i$ and $j$ with a third agree to depth _at least_
+$min(i, j)$ with each other). It
 means something only if the encoding puts meaning in the low digits: for a
 hierarchy, write the root's choice as the last digit, the next level's as
 the one before, and so on, and the depth becomes the number of shared
@@ -359,9 +377,13 @@ distinct primes below #h5.rows.at(0).bound and finds
 
 = Experiments <sec-experiments>
 
-All experiments are executable proofs: scripts that assert their predicted
-outcomes, written down before the first run, and emit a report and a data
-file only when every assertion holds. Arithmetic is exact (integers and
+All experiments are executable scripts that assert their expected outcomes
+and emit a report and a data file only when every assertion holds. Most
+thresholds were fixed after an exploratory pilot had measured the effect,
+so they guard the result against regressions rather than predict it
+blind; the FHRR predictions below were derived from a variance argument
+before any FHRR run. The exact-memory rows check Propositions 1, 2 and 4 in
+software: they test the implementation, not an empirical hypothesis. Arithmetic is exact (integers and
 fractions); NumPy is used as an integer array engine for the baselines.
 Tables in this paper are generated from those data files.
 
@@ -378,13 +400,14 @@ exact memory's bits and at $n = "10,000"$.
 
 #datatable(
   m1,
-  ("K", "ex_recall", "ex_false", "ex_bits", "ratio", "m_recall", "m_false", "t_recall", "t_false"),
-  ("K", "exact", "false", "bits", "÷ floor", "MAP same bits", "false", "MAP n=10⁴", "false"),
-  [Exact memory against MAP. Recall is stored keys answered correctly; _false_ is absent keys answered (of 300).],
+  ("K", "ex_recall", "ex_false", "ex_bits", "ratio", "set_ratio", "m_recall", "m_false", "t_recall", "t_false"),
+  ("K", "exact", "false", "bits", "÷ packed", "÷ set floor", "MAP same bits", "false", "MAP n=10⁴", "false"),
+  [Exact memory against MAP. Recall is stored keys answered correctly; _false_ is absent keys answered (of 300). _÷ packed_: against $K (ceil(log_2 U) + ceil(log_2 V))$ bits; _÷ set floor_: against $ceil(log_2 (binom(U, K) (V-1)^K))$.],
 ) <tab-map>
 
 The exact memory recalls every stored key and no absent key at every load,
-at a constant ratio to the floor (@tab-map). MAP at the same bits fails from
+at a constant ratio to the packed table, and a slowly rising one to the
+set floor (@tab-map). MAP at the same bits fails from
 the smallest load. Given $n = "10,000"$ dimensions, many times the bits, it is
 perfect to $K = 100$, answers #cell(m1, "K", 300, "t_false") of 300 absent
 keys at $K = 300$, and recalls #cell(m1, "K", 1000, "t_recall") at
@@ -445,8 +468,9 @@ power $N <= 2^14$; all three choices favour them.
 The ratio grows from #cell(m7, "K", 10, "ratio") at 10 facts to
 #cell(m7, "K", 3000, "ratio") at 3,000 (@tab-dr). What the premium buys is
 real: their memory survives corrupted entries, ours does not. The two
-constructions sit at opposite corners — exact at the information floor and
-fragile, or exact under noise at quadratic cost.
+constructions sit at opposite corners — exact near the packed size and
+fragile, or exact under noise at quadratic cost; redundant moduli
+(@sec-limits) could place a CRT memory between them, which we leave untested.
 
 == Holistic operations
 
@@ -473,13 +497,14 @@ exact record's #fmt(at-k(h1, "m", 100).ex_bits).
 
 Records have $m$ roles, the first $m$ primes above $V = "1,000"$, with values
 $0 <= v < V$ ($0$ an empty role); 200 records per $m$. Only $N$ is stored;
-$D$ is recomputed from the schema. The floor is $m ceil(log_2 V)$ bits.
+$D$ is recomputed from the schema. The packed size is $m ceil(log_2 V)$ bits.
+Merge is tested on pairs of records with disjoint supports.
 
 #datatable(
   s1,
   ("m", "round_trip", "n_bits", "floor", "ratio", "frac_bits", "frac_ratio", "merge", "holding"),
-  ("roles m", "round trip", "N bits", "floor", "÷ floor", "fraction bits", "÷ schema", "merge", "holding"),
-  [Schema mode: exact round trip, size against the floor and against storing $N$ and $D$, and the operations.],
+  ("roles m", "round trip", "N bits", "packed", "÷ packed", "fraction bits", "÷ schema", "merge", "holding"),
+  [Schema mode: exact round trip, size against the packed size and against storing $N$ and $D$, and the operations.],
 ) <tab-schema>
 
 For a sparse memory over a known dictionary of $U = "20,000"$ entries, the key
@@ -555,8 +580,10 @@ Huffman code gives frequent symbols the shortest words.
 = Limitations <sec-limits>
 
 - *No noise tolerance.* One flipped bit of $N$ or $D$ corrupts the whole
-  memory. Graceful degradation, the main virtue of VSAs, is absent by
-  construction.
+  memory as built here. Graceful degradation, the main virtue of VSAs, is
+  absent from this form, though not from the representation: redundant
+  moduli turn a CRT integer into an error-correcting code
+  @goldreich2000crt, at a cost in bits we have not measured.
 - *Query cost grows with the memory.* Recall reduces an integer of
   $approx 2 sum log_2 q$ bits modulo $q$: linear in the memory's size, not
   constant like a hash table.
@@ -578,8 +605,8 @@ Huffman code gives frequent symbols the shortest words.
 
 Superposition does not have to be noisy. Writing a key–value memory as one
 reduced fraction gives exact recall, exact absence, and merge and delete as
-arithmetic, at about 1.3× the information floor — or at the floor itself
-when the key set is known and only the numerator is kept; its denominator turns
+arithmetic, at about 1.3× an ideally packed table — or within
+#cell(s1, "m", 10, "ratio") to #cell(s1, "m", 1000, "ratio") of it when the key set is known and only the numerator is kept; its denominator turns
 value queries, analogy and role agreement into one subtraction each, and
 with $q$-adic precision it grades nearness, exactly, over shared concepts
 and shared ancestry at once. It does not re-bind holistically, and cannot. Against VSAs at equal storage, the

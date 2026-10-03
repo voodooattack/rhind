@@ -12,8 +12,8 @@ Schlegel et al.'s taxonomy, where MAP-B would threshold the bundle to ±1;
 named MAP-B here before 2026-10-02), clean-up by integer dot product
 against the value vectors, "present" when the best score ≥ n/2), at two
 sizes: n matched to the exact memory's bits, and n = 10,000. And with the
-ideal packed table, K·(⌈log₂ keys⌉ + ⌈log₂ values⌉) bits, the floor for any
-exact store. Universe: 20,000 keys, 1,000 values.
+ideal packed table, K·(⌈log₂ keys⌉ + ⌈log₂ values⌉) bits (an ordered table:
+not the information floor, see P1b). Universe: 20,000 keys, 1,000 values.
 
 Predictions, on record BEFORE running (exploration 036 measured them):
   P1  ExactMemory recalls every present key and no absent key at every K,
@@ -24,6 +24,15 @@ Predictions, on record BEFORE running (exploration 036 measured them):
       MAP-I's clean-up (milliseconds).
   P4  Any sequence of inserts, deletes and merges leaves the memory equal to
       one rebuilt from scratch.
+
+Added 2026-10-03 after a cold review (its check c02 computed these): the
+packed table is not the information floor. K facts as an unordered set of
+keys from U, each with one of V − 1 values, need ⌈log₂(C(U, K)·(V−1)^K)⌉
+bits; packing in key order wastes about log₂ K! of them.
+  P1b ExactMemory against that set floor: 1.4–1.6× at K = 10, rising with K
+      (never falling from one K to the next), below 2.5× at K = 3,000. The
+      memory spends ≈ 2 log₂ q per fact; the floor per fact shrinks as K
+      grows.
 
 Added 2026-10-02 (the literature survey asked for the strongest dense VSA,
 FHRR, next to MAP-I). FHRR: random phasors, bind by elementwise product
@@ -200,7 +209,7 @@ def run():
     )  # (K, facts_idx, absent, exact bits, MAP same-bits recall, MAP 10k recall)
 
     @verified_section(
-        "P1–P3 — recall, false recalls, size and speed against MAP-I and the packed floor"
+        "P1–P3 — recall, false recalls, size and speed against MAP-I, the packed table and the set floor"
     )
     @table(
         headers=[
@@ -209,6 +218,7 @@ def run():
             "ex_false",
             "ex_bits",
             "ratio",
+            "set_ratio",
             "ex_us",
             "m_recall",
             "m_false",
@@ -221,7 +231,8 @@ def run():
             "exact: recall",
             "exact: false",
             "exact: bits",
-            "÷ floor",
+            "÷ packed",
+            "÷ set floor",
             "exact: µs",
             "MAP same bits: recall",
             "MAP same bits: false",
@@ -229,14 +240,16 @@ def run():
             "MAP n=10,000: recall",
             "MAP n=10,000: false",
         ],
-        align=["r"] * 11,
+        align=["r"] * 12,
         legend={
             "ratio": "exact memory bits ÷ ideal packed table K·(15 + 10) bits",
+            "set_ratio": "exact memory bits ÷ ⌈log₂(C(U, K)·(V−1)^K)⌉, the floor for an unordered set of K facts",
             "ex_false": f"absent keys answered, of {PROBES}",
             "m_recall": "MAP-I with n chosen so its counters use the exact memory's bits",
         },
     )
     def _rows():
+        last_set = [0]
         for K in KS:
             keys = rng.sample(range(U), K)
             kset = set(keys)
@@ -253,6 +266,12 @@ def run():
             assert ok == len(probe) and false == 0  # P1
             ratio = 100 * mem.bits() // (K * floor_per)
             assert 100 <= ratio <= 135, ratio  # P1
+            set_floor = (comb(U, K) * (V - 1) ** K - 1).bit_length()
+            set_ratio = 100 * mem.bits() // set_floor
+            if K == KS[0]:
+                assert 140 <= set_ratio <= 160, set_ratio  # P1b
+            assert set_ratio < 250 and set_ratio >= last_set[0], set_ratio  # P1b
+            last_set[0] = set_ratio
             n = max(8, mem.bits() // (2 * K + 1).bit_length())
             mo, mn, mf, _, mus = _map(facts_idx, absent, n, rng_np)
             assert 2 * mo < mn  # P2
@@ -281,6 +300,7 @@ def run():
                 ex_false=false,
                 ex_bits=mem.bits(),
                 ratio=f"{ratio // 100}.{ratio % 100:02d}×",
+                set_ratio=f"{set_ratio // 100}.{set_ratio % 100:02d}×",
                 ex_us=us,
                 m_recall=f"{mo}/{mn}",
                 m_false=mf,
@@ -291,7 +311,7 @@ def run():
         yield finding(
             "P1–P3",
             "exact recall and zero false recalls at every K, at ≈ 1.3× the packed "
-            "floor and microsecond queries; MAP-I fails at the same bits from the "
+            "table (1.5–2.3× the set floor, rising with K) and microsecond queries; MAP-I fails at the same bits from the "
             "smallest K and, at n = 10,000, collapses by K = 1,000",
         )
 

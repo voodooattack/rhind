@@ -136,12 +136,13 @@ def test_analogy_reads_the_value_at_the_matching_role():
         if list(b.values()).count(b[q]) != 1:
             continue  # x must sit at one role in b
         assert ExactMemory.build(a).analogy(ExactMemory.build(b), b[q], BAG) == a[q]
+    b = ExactMemory.build({q: 1 for q in ROLES})
+    assert ExactMemory.build(_record(rng)).analogy(b, 2, BAG) is None  # x held nowhere
     assert (
-        ExactMemory.build(_record(rng)).analogy(
-            ExactMemory.build({q: 1 for q in ROLES}), V + 5, BAG
-        )
-        is None
-    )
+        ExactMemory.build(_record(rng)).analogy(b, 1, BAG) is None
+    )  # x held at every role
+    with pytest.raises(ValueError, match="not below"):  # x not below the keys
+        ExactMemory.build(_record(rng)).analogy(b, V + 5, BAG)
 
 
 def test_agreeing_is_the_product_of_equal_roles():
@@ -204,3 +205,50 @@ def test_composite_keys_are_refused():
     with pytest.raises(ValueError, match="not prime"):
         mem.rebind(1009, 1015)  # 1015 = 5 · 7 · 29
     assert mem.rebind(1009, 1013).get(1013) == 42
+
+
+def test_queries_must_be_primes():
+    """A product of present keys divides D, and so does 1: without a
+    primality check `get(143)` on keys 11 and 13 would answer (cold review,
+    2026-10-03). Non-prime queries are refused by get and never contained."""
+    mem = ExactMemory.build({11: 5, 13: 7})
+    for q in (1, 143, 121, 15):
+        with pytest.raises(ValueError, match="not prime"):
+            mem.get(q)
+        assert q not in mem
+    assert 11 in mem and mem.get(11) == 5 and mem.get(17) is None
+
+
+def test_holding_refuses_a_value_not_below_every_key():
+    """holding needs x below every key of the bag: 16 ≡ 5 (mod 11) would
+    otherwise report key 11 as holding 16."""
+    mem = ExactMemory.build({11: 5, 13: 7})
+    bag = ExactMemory.key_bag([11, 13])
+    with pytest.raises(ValueError, match="not below"):
+        mem.holding(16, bag)
+    with pytest.raises(ValueError, match="not below"):
+        mem.holding(11, bag)
+    assert mem.holding(5, bag) == 11 and mem.holding(10, bag) == 1
+
+
+def test_holding_reports_only_keys_of_the_bag():
+    """Proposition 2 as corrected: a stored key outside the bag keeps its
+    term in the denominator whatever it holds, and is never reported."""
+    from fractions import Fraction
+
+    mem = ExactMemory.build({11: 5, 13: 5})
+    bag = ExactMemory.key_bag([11])
+    assert (mem.F - 5 * bag.F).denominator == 13
+    assert mem.holding(5, bag) == 11
+
+
+def test_merge_adds_values_at_shared_keys():
+    """Merge is per-key addition mod q, not a union: A + A doubles, and
+    values summing to q delete the key. conflicts names shared keys,
+    agreeing names the shared keys with equal values."""
+    a = ExactMemory.build({11: 5})
+    assert (a + a).get(11) == 10
+    assert 11 not in a + ExactMemory.build({11: 6})
+    assert a.conflicts(a) == 11 and a.agreeing(a) == 11
+    assert a.agreeing(ExactMemory.build({11: 6})) == 1
+    assert (a - ExactMemory.build({11: 4})).get(11) == 1  # delete needs the value

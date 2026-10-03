@@ -10,7 +10,8 @@ a key whose value reaches 0 mod q drops out of D by reduction. Restricting
 to a subset of keys is one CRT step. Everything is exact.
 
 A query needs only the key's prime, so keys may come from a shared
-PrimeDictionary or from any deterministic map (a hash to a prime). Listing
+PrimeDictionary or from any deterministic map onto distinct primes (a plain
+hash to a prime can collide, and a collision merges two keys). Listing
 the keys present needs D factored, which is cheap only over a known
 dictionary.
 
@@ -38,6 +39,11 @@ from math import gcd, prod
 
 from rhind.dictionary import PrimeDictionary
 from rhind.primes import is_prime
+
+
+def _primorial(x: int) -> int:
+    """Product of the primes ≤ x (x small: a value, not a key)."""
+    return prod(p for p in range(2, x + 1) if is_prime(p))
 
 
 def _den(F: Fraction) -> int:
@@ -90,13 +96,19 @@ class ExactMemory:
         return self.F.denominator
 
     def get(self, q: int):
-        """The value stored under prime key q, or None if q is absent."""
+        """The value stored under prime key q, or None if q is absent.
+
+        q must be prime: a product of present keys divides D too, and 1
+        divides everything, so without the check `get(143)` on keys 11 and 13
+        would answer. "No false positives" holds for prime queries."""
+        if not is_prime(q):
+            raise ValueError(f"key {q} is not prime")
         if self.D % q:
             return None
         return self.N % q * pow((self.D // q) % q, -1, q) % q or None
 
     def __contains__(self, q: int) -> bool:
-        return self.D % q == 0
+        return is_prime(q) and self.D % q == 0
 
     def keys(self, dic: PrimeDictionary) -> list:
         """Keys present, by factoring D over a known dictionary."""
@@ -117,13 +129,19 @@ class ExactMemory:
         return ExactMemory(self.F + other.F)
 
     def delete(self, other: "ExactMemory") -> "ExactMemory":
+        """Subtract. Removes a fact only if `other` carries its exact value
+        (read, then subtract); any other value leaves the difference."""
         return ExactMemory(self.F - other.F)
 
     __add__ = merge
     __sub__ = delete
 
     def conflicts(self, other: "ExactMemory") -> int:
-        """Product of the keys both memories hold (1 if they are disjoint)."""
+        """Product of the keys both memories hold (1 if they are disjoint).
+
+        Shared, not necessarily disagreeing: merging adds values at these
+        keys mod q (A + A doubles A; values summing to q delete the key).
+        `agreeing` tells which shared keys hold equal values."""
         return gcd(self.D, other.D)
 
     def project(self, keys) -> "ExactMemory":
@@ -154,6 +172,8 @@ class ExactMemory:
         alone is wrong as soon as the bag names an empty role."""
         if x <= 0:
             raise ValueError("values are positive")
+        if gcd(bag.D, _primorial(x)) > 1:
+            raise ValueError(f"x = {x} is not below every key of the bag")
         both = self.D // gcd(self.D, bag.D) * bag.D
         return both // _den(self.F - x * bag.F)
 
@@ -164,7 +184,9 @@ class ExactMemory:
         return self.get(q) if q > 1 and is_prime(q) else None
 
     def agreeing(self, other: "ExactMemory") -> int:
-        """Product of the keys present in both memories with equal values."""
+        """Product of the keys present in both memories with equal values.
+
+        A key held by only one memory counts as differing."""
         lcm = self.D // gcd(self.D, other.D) * other.D
         return lcm // _den(self.F - other.F)
 

@@ -18,11 +18,15 @@ proof measures what it buys, and whether the operations survive.
 Predictions, on record BEFORE running (exploration 041 measured them):
   P1  Round trip is exact for full records of m = 10, 100, 1,000 roles,
       values 0 ≤ v < 1,000, 200 records each.
-  P2  N alone against the floor m·⌈log₂ V⌉ bits: ≤ 1.02× at m = 10,
+  P2  N alone against the packed size m·⌈log₂ V⌉ bits: ≤ 1.02× at m = 10,
       ≤ 1.06× at m = 100, ≤ 1.25× at m = 1,000. Fraction mode (N and D)
       costs ≥ 1.95× schema mode at every m.
-  P3  Merge is (N₁ + N₂) mod D and equals per-role (v₁ + v₂) mod q; the
+  P3  Merge of two records with disjoint supports (every role filled in at
+      most one of them) is (N₁ + N₂) mod D and decodes to their union; the
       value query holding(x) on the rebuilt F is exact, empty roles included.
+      (Revised 2026-10-03 after a cold review: the first version merged two
+      full records, which only checks per-role addition mod q, a different
+      modulus per role, and can leave the value range: not a meaningful merge.)
   P4  For sparse key sets (K keys of U = 20,000, by dictionary position) the
       cheapest key-set encoding among D, Elias-γ gaps of the positions and a
       U-bit bitmap is: D at K = 10; γ gaps at K = 100 … 3,000; the bitmap at
@@ -90,16 +94,16 @@ def run():
             "roles m",
             "round trip",
             "N bits (max)",
-            "floor",
-            "÷ floor",
+            "packed",
+            "÷ packed",
             "fraction mode bits",
             "÷ schema",
-            "merge exact",
+            "merge (disjoint) exact",
             "holding exact",
         ],
         align=["r", "r", "r", "r", "r", "r", "r", "l", "l"],
         legend={
-            "floor": "m·⌈log₂ V⌉ bits, V = 1,000",
+            "floor": "packed size m·⌈log₂ V⌉ bits, V = 1,000",
             "frac_bits": "N and D stored, as in proof 001",
             "holding": "every x = 1, 38, 75, …; records include empty roles",
         },
@@ -122,9 +126,11 @@ def run():
             frac = worst + D.bit_length()
             assert 100 * frac >= 195 * worst  # P2
             a = [rng.randrange(V) for _ in keys]
-            b = [rng.randrange(V) for _ in keys]
-            merged = _decode((_encode(a, keys, D) + _encode(b, keys, D)) % D, keys, D)
-            merge_ok = merged == [(x + y) % q for x, y, q in zip(a, b, keys)]
+            side = [rng.randrange(2) for _ in keys]  # disjoint supports
+            a1 = [v if s else 0 for v, s in zip(a, side)]
+            a2 = [0 if s else v for v, s in zip(a, side)]
+            merged = _decode((_encode(a1, keys, D) + _encode(a2, keys, D)) % D, keys, D)
+            merge_ok = merged == a
             mem = ExactMemory(Fraction(_encode(a, keys, D), D))
             hold_ok = all(
                 mem.holding(x, bag) == prod(q for v, q in zip(a, keys) if v == x)
@@ -145,8 +151,8 @@ def run():
         yield finding(
             "P1–P3",
             "with the key set known, N alone round-trips every record at 1.01× "
-            "the information floor for 10 roles and 1.20× for 1,000, half of "
-            "fraction mode; merge and the value query survive",
+            "the packed size m·⌈log₂ V⌉ for 10 roles and 1.20× for 1,000, half of "
+            "fraction mode; merge of disjoint records and the value query survive",
         )
 
     @verified_section("P4 — sparse key sets: the cheapest encoding of the keys")
