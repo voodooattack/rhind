@@ -1,0 +1,112 @@
+{
+  "rows": [
+    {
+      "m": 3,
+      "exact record bits": 48,
+      "exact": {
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "200/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200",
+        "us per op": 2
+      },
+      "map n=10000 bits": 30000,
+      "map n=10000": {
+        "n": 10000,
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "164/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200"
+      },
+      "map matched bits bits": 48,
+      "map matched bits": {
+        "n": 16,
+        "analogy": "8/200",
+        "analogy, pairs sharing fillers": "64/200",
+        "agreeing roles": "82/200",
+        "re-binding": "21/200"
+      }
+    },
+    {
+      "m": 10,
+      "exact record bits": 200,
+      "exact": {
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "200/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200",
+        "us per op": 3
+      },
+      "map n=10000 bits": 50000,
+      "map n=10000": {
+        "n": 10000,
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "131/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200"
+      },
+      "map matched bits bits": 200,
+      "map matched bits": {
+        "n": 40,
+        "analogy": "2/200",
+        "analogy, pairs sharing fillers": "80/200",
+        "agreeing roles": "44/200",
+        "re-binding": "3/200"
+      }
+    },
+    {
+      "m": 30,
+      "exact record bits": 695,
+      "exact": {
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "200/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200",
+        "us per op": 7
+      },
+      "map n=10000 bits": 60000,
+      "map n=10000": {
+        "n": 10000,
+        "analogy": "81/200",
+        "analogy, pairs sharing fillers": "108/200",
+        "agreeing roles": "174/200",
+        "re-binding": "200/200"
+      },
+      "map matched bits bits": 690,
+      "map matched bits": {
+        "n": 115,
+        "analogy": "0/200",
+        "analogy, pairs sharing fillers": "95/200",
+        "agreeing roles": "15/200",
+        "re-binding": "2/200"
+      }
+    },
+    {
+      "m": 100,
+      "exact record bits": 2668,
+      "exact": {
+        "analogy": "200/200",
+        "analogy, pairs sharing fillers": "200/200",
+        "agreeing roles": "200/200",
+        "re-binding": "200/200",
+        "us per op": 28
+      },
+      "map n=10000 bits": 80000,
+      "map n=10000": {
+        "n": 10000,
+        "analogy": "1/200",
+        "analogy, pairs sharing fillers": "87/200",
+        "agreeing roles": "64/200",
+        "re-binding": "200/200"
+      },
+      "map matched bits bits": 2664,
+      "map matched bits": {
+        "n": 333,
+        "analogy": "0/200",
+        "analogy, pairs sharing fillers": "99/200",
+        "agreeing roles": "13/200",
+        "re-binding": "0/200"
+      }
+    }
+  ]
+}

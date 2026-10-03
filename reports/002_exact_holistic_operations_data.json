@@ -1,0 +1,147 @@
+{
+ "title": "002 — Exact holistic operations, and why re-binding cannot be one",
+ "sections": [
+  {
+   "title": "P1–P4 — analogy, agreeing roles and re-binding against MAP-I",
+   "headers": [
+    "m",
+    "ex",
+    "ex_bits",
+    "an",
+    "ag",
+    "rb",
+    "map_bits",
+    "an_m",
+    "ag_m",
+    "rb_m"
+   ],
+   "labels": [
+    "roles m",
+    "exact: all three ops",
+    "exact bits",
+    "MAP 10k: analogy",
+    "MAP 10k: agreeing count",
+    "MAP 10k: re-binding",
+    "MAP 10k bits",
+    "MAP same bits: analogy",
+    "same bits: agreeing",
+    "same bits: re-binding"
+   ],
+   "legend": {
+    "ex": "correct operations of 300 (analogy, agreeing roles, re-binding)",
+    "an": "correct of 100; analogy pairs share no filler (Kanerva's setting)"
+   },
+   "rows": [
+    {
+     "m": 3,
+     "ex": "300/300",
+     "ex_bits": 49,
+     "an": 100,
+     "ag": 100,
+     "rb": 100,
+     "map_bits": 30000,
+     "an_m": 7,
+     "ag_m": 35,
+     "rb_m": 16
+    },
+    {
+     "m": 10,
+     "ex": "300/300",
+     "ex_bits": 201,
+     "an": 100,
+     "ag": 100,
+     "rb": 100,
+     "map_bits": 50000,
+     "an_m": 0,
+     "ag_m": 21,
+     "rb_m": 0
+    },
+    {
+     "m": 30,
+     "ex": "300/300",
+     "ex_bits": 695,
+     "an": 42,
+     "ag": 80,
+     "rb": 100,
+     "map_bits": 60000,
+     "an_m": 0,
+     "ag_m": 11,
+     "rb_m": 1
+    },
+    {
+     "m": 100,
+     "ex": "300/300",
+     "ex_bits": 2668,
+     "an": 0,
+     "ag": 40,
+     "rb": 100,
+     "map_bits": 80000,
+     "an_m": 0,
+     "ag_m": 6,
+     "rb_m": 0
+    }
+   ],
+   "findings": [
+    {
+     "label": "P1–P4",
+     "value": "every exact operation correct at every m, at a small fraction of MAP-I's storage; MAP-I's analogy and agreeing counts degrade with record size"
+    }
+   ]
+  },
+  {
+   "title": "P5 — no additive map moves a value between keys",
+   "headers": [
+    "bound",
+    "pairs",
+    "nonzero"
+   ],
+   "labels": [
+    "primes below",
+    "ordered pairs (p, q), p ≠ q",
+    "additive maps ℤ/p → ℤ/q other than 0"
+   ],
+   "rows": [
+    {
+     "bound": 200,
+     "pairs": 2070,
+     "nonzero": 0
+    }
+   ],
+   "findings": [
+    {
+     "label": "P5",
+     "value": "every additive map between distinct prime keys is zero, so re-binding must read the value out to ℤ: there is no holistic exact form"
+    }
+   ]
+  },
+  {
+   "title": "Analogy as records grow",
+   "points": [
+    {
+     "x": 3,
+     "exact": 1000,
+     "MAP n=10,000": 1000,
+     "MAP same bits": 70
+    },
+    {
+     "x": 10,
+     "exact": 1000,
+     "MAP n=10,000": 1000,
+     "MAP same bits": 0
+    },
+    {
+     "x": 30,
+     "exact": 1000,
+     "MAP n=10,000": 420,
+     "MAP same bits": 0
+    },
+    {
+     "x": 100,
+     "exact": 1000,
+     "MAP n=10,000": 0,
+     "MAP same bits": 0
+    }
+   ]
+  }
+ ]
+}

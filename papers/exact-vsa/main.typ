@@ -1,0 +1,408 @@
+// Exact vector-symbolic memory from partial fractions — draft.
+// Build from the repository root (data paths are root-relative):
+//   typst compile --root . papers/exact-vsa/main.typ
+// Every number in a table, and every number quoted in the prose through
+// #cell(...), is read from the proofs' data files. Re-run the proofs and
+// recompile; nothing is copied by hand.
+
+#let d001 = json("/reports/001_exact_memory_vs_noisy_vsa_data.json")
+#let d002 = json("/reports/002_exact_holistic_operations_data.json")
+
+#let sec(d, prefix) = d.sections.find(s => s.title.starts-with(prefix))
+#let at-k(s, key, value) = s.rows.find(r => r.at(key) == value)
+#let cell(s, key, value, col) = [#at-k(s, key, value).at(col)]
+
+// Thousands separators for integers; strings pass through.
+#let fmt(v) = {
+  if type(v) == int {
+    let s = str(calc.abs(v))
+    let out = ""
+    let n = s.len()
+    for (i, ch) in s.clusters().enumerate() {
+      if i > 0 and calc.rem(n - i, 3) == 0 { out += "," }
+      out += ch
+    }
+    if v < 0 { "−" + out } else { out }
+  } else { str(v) }
+}
+
+#let datatable(s, cols, heads, caption) = figure(
+  table(
+    columns: cols.len(),
+    align: (x, _) => if x == 0 { left } else { right },
+    stroke: none,
+    table.hline(),
+    table.header(..heads.map(h => text(size: 8.5pt)[*#h*])),
+    table.hline(stroke: 0.5pt),
+    ..s.rows.map(r => cols.map(c => text(size: 8.5pt)[#fmt(r.at(c))])).flatten(),
+    table.hline(),
+  ),
+  caption: caption,
+  kind: table,
+)
+
+#let m1 = sec(d001, "P1–P3")
+#let m5 = sec(d001, "P5–P6")
+#let m7 = sec(d001, "P7")
+#let m4 = sec(d001, "P4")
+#let h1 = sec(d002, "P1–P4")
+#let h5 = sec(d002, "P5")
+
+#set document(title: "Exact Vector-Symbolic Memory from Partial Fractions", author: "Abdullah Ali")
+#set page(paper: "a4", margin: (x: 2.2cm, y: 2.4cm), numbering: "1")
+#set text(size: 10.5pt, lang: "en")
+#set par(justify: true)
+#set heading(numbering: "1.")
+#set math.equation(numbering: "(1)")
+#show figure.where(kind: table): set figure.caption(position: top)
+
+#let theorem(name, body) = block(width: 100%, inset: (y: 3pt))[*#name.* #emph(body)]
+#let proof(body) = block(width: 100%, inset: (y: 2pt))[_Proof._ #body #h(1fr) $square$]
+
+#align(center)[
+  #text(size: 16pt, weight: "bold")[Exact Vector-Symbolic Memory from Partial Fractions]
+  #v(4pt)
+  Abdullah Ali \
+  #text(size: 9pt)[Independent researcher · #link("mailto:voodooattack@gmail.com")[voodooattack\@gmail.com]]
+  #v(2pt)
+  #text(size: 9pt, fill: gray)[Draft — #datetime.today().display()]
+]
+
+#v(6pt)
+#block(inset: (x: 1.2cm))[
+  #set text(size: 9.5pt)
+  *Abstract.* Vector symbolic architectures (VSAs) store key–value facts by
+  superposing bound vectors, and pay for superposition with noise: recall
+  degrades with load, and absent keys are answered with false positives. We
+  show that a single reduced fraction gives the same interface exactly. Keys
+  are distinct primes $q$, a value is a residue $1 <= v < q$, and a memory is
+  $F = sum v_q \/ q mod 1$. Recall is one modular inversion, absence is
+  non-divisibility of the denominator, and merge and delete are fraction
+  addition and subtraction. The construction is the classical
+  Chinese-remainder "secure lock" in partial-fraction form; what the fraction
+  form adds is that the denominator _is_ the key set. That yields holistic
+  queries that VSAs answer only approximately — every key holding a given
+  value in one subtraction, exact analogy, and the set of agreeing roles of
+  two records — and a proof that exact re-binding cannot be holistic,
+  because $"Hom"(ZZ\/p, ZZ\/q) = 0$. The memory costs about 1.3× the
+  information floor. At equal storage the strongest dense VSA (FHRR) is no
+  better than a bipolar one, and the closest published exact VSA needs
+  #cell(m7, "K", 10, "ratio") to #cell(m7, "K", 3000, "ratio") the bits, in exchange for noise tolerance that ours
+  lacks. Every number is produced by executable proofs.
+]
+
+= Introduction
+
+A VSA represents symbols as high-dimensional random vectors and composes
+them with two operations: _binding_ (an invertible product, associating a key
+with a value) and _bundling_ (a sum, superposing many facts in one vector)
+@plate1995hrr @kanerva2009hd @kleyko2022survey1. Unbinding a key from a
+bundle returns its value plus cross-talk from every other fact, and a
+_clean-up_ against the codebook removes the noise while the load is low. The
+capacity of this scheme is well understood @frady2018capacity: noise grows
+with the number of stored facts, so recall degrades gracefully and false
+recalls appear.
+
+The attraction of VSAs is not lookup — a dictionary does that — but
+operations on whole structures: analogy through a mapping vector
+@kanerva2010dollar, similarity between composite records, re-binding a role.
+This paper asks what those operations look like when the memory is exact.
+
+Our answer uses rational numbers. Superposition is fraction addition; the
+key of a fact is the prime in its denominator; the value is the residue in
+its numerator. Because distinct primes are coprime, the partial-fraction
+decomposition of the sum is unique, and every fact is recoverable.
+
+*Contributions.*
+- An exact key–value memory $F = sum v_q \/ q mod 1$ with one-step recall,
+  detection of absent keys, and merge and delete as $+$ and $-$
+  (@sec-memory). We identify it with the Chinese-remainder secure lock
+  @chiou1989lock and state what the fraction form adds.
+- Exact holistic operations: all keys holding a value, analogy, and agreeing
+  roles, each by one subtraction and a denominator (@sec-holistic).
+- A proof that no exact memory of this kind has a holistic re-binding
+  (@sec-rebind).
+- An empirical comparison at equal storage against a bipolar VSA, against
+  FHRR, and against the exact VSA of Deng and Raviv
+  @dengraviv2025histogram, with every number produced by an executable
+  proof (@sec-experiments).
+
+= Related work <sec-related>
+
+*Noisy VSAs.* Holographic reduced representations @plate1995hrr,
+multiply–add–permute (MAP) and its variants, Fourier HRR (FHRR) and others
+are surveyed in @kleyko2022survey1 @kleyko2022survey2 and compared
+empirically in @schlegel2022comparison. All trade exactness for a fixed
+dimension; capacity theory is in @frady2018capacity. We compare against MAP-I
+(integer bundling) and against FHRR.
+
+*Residue VSAs.* Kymn et al. @kymn2023residue encode integers as phasor
+vectors whose frequencies are roots of unity for a set of moduli, so that
+addition and multiplication of encoded numbers are exact; decoding uses a
+resonator network and similarity is approximate. A Lisp built on that
+representation appears in @vsalisp2025. These encode _numbers_ by the
+Chinese remainder theorem (CRT); we encode a _memory_ by it. Thaine and
+Penn @thaine2021crt pack an embedding vector into one integer by the CRT.
+
+*Exact VSAs.* Deng and Raviv @dengraviv2025histogram build VSA atoms from
+concatenated Reed–Solomon and Hadamard codes and recover a superposition of
+up to a bounded number of codewords by list decoding, with formal
+guarantees and tolerance to noise. It is the closest published exact VSA;
+@sec-dr compares sizes.
+
+*CRT broadcasting.* Chiou and Chen's secure lock @chiou1989lock, and later
+CRT key distribution @intel1998patent, broadcast one integer $X$ with
+$X equiv k_i (mod p_i)$ so that receiver $i$ reads its key as $X mod p_i$.
+Our numerator is such an $X$ (@sec-memory). The goals differ: a broadcast
+lock must give non-members garbage, while our memory must _detect_ absent
+keys, which the fraction's denominator does.
+
+*Set reconciliation.* Minsky, Trachtenberg and Zippel
+@minsky2003reconciliation reconcile sets through rational functions of
+their characteristic polynomials. Our key bag $S = sum 1\/q$ is the integer
+analogue of the logarithmic derivative $chi'\/chi = sum 1\/(z - a)$ of a
+characteristic polynomial $chi$.
+
+= The memory <sec-memory>
+
+Fix a set of _keys_: distinct primes. A _fact_ is a pair $(q, v)$ with $q$ a
+key and $1 <= v < q$. A memory holding facts $\{(q, v_q) : q in Q\}$ is
+
+$ F = sum_(q in Q) v_q / q mod 1 = N / D, quad gcd(N, D) = 1, quad 0 <= N < D. $ <eq-memory>
+
+#theorem("Proposition 1 (structure and recall)")[
+  $D = product_(q in Q) q$, and for each $q in Q$,
+  $v_q equiv N dot (D\/q)^(-1) (mod q)$.
+]
+#proof[
+  Multiplying @eq-memory by $P = product_(q in Q) q$ gives
+  $F P equiv sum_q v_q (P\/q) (mod P)$. Modulo a fixed $q in Q$, every term
+  but one contains the factor $q$, leaving $v_q (P\/q)$, which is nonzero
+  because $q divides.not v_q$ and $q divides.not P\/q$. So no $q$ divides the
+  numerator of $F P \/ P$, the fraction is already reduced, $D = P$, and
+  $N equiv v_q (D\/q) (mod q)$; $D\/q$ is invertible modulo $q$.
+]
+
+Recall is therefore one multiplication and one reduction modulo $q$.
+A key $p$ is _absent_ exactly when $p divides.not D$, so the memory answers
+"not stored" without false positives. Facts are added and removed by
+$F plus.minus v\/q$; two memories over disjoint keys merge by $F_A + F_B$;
+two memories that disagree on a key are detected by $gcd(D_A, D_B) > 1$.
+Projecting onto a subset $R subset Q$ is one CRT step.
+
+*Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
+bits. With keys the primes above the value range, this is about
+#cell(m1, "K", 1000, "ratio") the size of an ideally packed table of
+$K (ceil(log_2 U) + ceil(log_2 V))$ bits (@tab-map).
+
+*Relation to the secure lock.* Proposition 1 says $N$ solves the system
+$X equiv v_q (D\/q) (mod q)$: the CRT broadcast integer of
+@chiou1989lock, with each slot scaled by the unit $D\/q$. Two properties
+come from carrying the fraction rather than the integer. The modulus
+travels with the value, so merge is plain addition rather than a CRT
+recombination; and membership is read from $D$.
+
+= Holistic operations <sec-holistic>
+
+Let $S = sum_(q in Q) 1\/q$ be the _key bag_ of $Q$. For records that share
+a key set (a schema of roles), one $S$ serves them all.
+
+#theorem("Proposition 2 (value query)")[
+  For an integer $x$ with $1 <= x < min Q$,
+  $"den"(F - x S) = product_(q in Q, v_q != x) q$.
+  Hence the keys holding $x$ are the prime factors of $D \/ "den"(F - x S)$.
+]
+#proof[
+  $F - x S equiv sum_q (v_q - x)\/q$. Terms with $v_q = x$ vanish. Otherwise
+  $0 < |v_q - x| < q$, so the term has exact denominator $q$, and by the
+  argument of Proposition 1 the denominator of the sum is the product of
+  those $q$.
+]
+
+One subtraction thus subtracts $x$ from every value at once, and the matches
+drop out of the denominator. Two operations follow directly.
+
+*Analogy* — "what is the dollar of Mexico?" @kanerva2010dollar. Given
+records $A$ (Mexico) and $B$ (USA) over the same roles, the role of $x$
+(dollar) in $B$ is $D_B \/ "den"(F_B - x S)$; the answer is $A$'s value at
+that role (Proposition 1). In a VSA the same query unbinds through a mapping
+vector $A dot.o B$ whose $m^2$ cross terms make it approximate.
+
+*Agreeing roles.* For records $A$, $B$,
+$"den"(F_A - F_B) = product q$ over keys where the records differ (a key
+stored in only one counts as differing), so
+$"lcm"(D_A, D_B) \/ "den"(F_A - F_B)$ is the product of the keys on which
+they agree.
+
+== Re-binding is not holistic <sec-rebind>
+
+Re-binding moves a value from key $p$ to key $q$. In a VSA it is linear
+— multiply the bundle by $p dot.o q$ — because all keys live in one
+group. Here they do not. The $p$-part of $F$ lives in
+$(1\/p) ZZ \/ ZZ tilde.equiv ZZ\/p$ and the $q$-part in $ZZ\/q$.
+
+#theorem("Proposition 3")[
+  For distinct primes $p$, $q$ every additive map $phi: ZZ\/p -> ZZ\/q$ is
+  zero.
+]
+#proof[
+  $phi$ is fixed by $c = phi(1)$ and must satisfy $p c = phi(p dot 1) =
+  phi(0) = 0$ in $ZZ\/q$. As $p$ is invertible modulo $q$, $c = 0$.
+]
+
+So no additive operation on the memory transfers a value between keys; an
+exact re-binding must read $v$ out to $ZZ$ (Proposition 1) and write
+$F - v\/p + v\/q$. The VSA's holistic re-binding is a consequence of the
+shared group that also makes it noisy. The proof script checks the
+statement exhaustively for the #fmt(h5.rows.at(0).pairs) ordered pairs of
+distinct primes below #h5.rows.at(0).bound and finds
+#h5.rows.at(0).nonzero nonzero maps.
+
+= Experiments <sec-experiments>
+
+All experiments are executable proofs: scripts that assert their predicted
+outcomes, written down before the first run, and emit a report and a data
+file only when every assertion holds. Arithmetic is exact (integers and
+fractions); NumPy is used as an integer array engine for the baselines.
+Tables in this paper are generated from those data files.
+
+*Setup.* A universe of $U = "20,000"$ keys and $V = "1,000"$ values; keys map
+to the primes above $V$. For each load $K$ we draw $K$ random facts, query
+up to 300 stored keys and 300 absent keys. *MAP-I* @schlegel2022comparison (below,
+MAP): bipolar atoms, binding by elementwise product, bundling by integer
+sum without thresholding, clean-up by integer dot product against all $V$
+value vectors, and "present" when the best score is at least $n\/2$. A VSA's
+bits are $n$ times the width of its largest counter. We report MAP at the
+exact memory's bits and at $n = "10,000"$.
+
+== Against a bipolar VSA
+
+#datatable(
+  m1,
+  ("K", "ex_recall", "ex_false", "ex_bits", "ratio", "m_recall", "m_false", "t_recall", "t_false"),
+  ("K", "exact", "false", "bits", "÷ floor", "MAP same bits", "false", "MAP n=10⁴", "false"),
+  [Exact memory against MAP. Recall is stored keys answered correctly; _false_ is absent keys answered (of 300).],
+) <tab-map>
+
+The exact memory recalls every stored key and no absent key at every load,
+at a constant ratio to the floor (@tab-map). MAP at the same bits fails from
+the smallest load. Given $n = "10,000"$ dimensions, many times the bits, it is
+perfect to $K = 100$, answers #cell(m1, "K", 300, "t_false") of 300 absent
+keys at $K = 300$, and recalls #cell(m1, "K", 1000, "t_recall") at
+$K = "1,000"$. The exact memory is also the fastest to query here:
+recall is one big-integer reduction, linear in the memory's size but run in
+native code (#cell(m1, "K", 3000, "ex_us") µs at $K = "3,000"$ against
+#cell(m1, "K", 3000, "m_us") µs for MAP's clean-up). Random sequences of
+#fmt(m4.rows.at(0).ops) inserts, deletes and merges leave the memory equal to
+one rebuilt from scratch.
+
+== Against FHRR
+
+FHRR binds by multiplying unit phasors and bundles by complex sum. We place
+the phases on the 4th roots of unity, so every component is a Gaussian
+integer and the clean-up score $"Re" sum_j m_j overline(z_j)$ is exact.
+This loses nothing: the noise a stored fact adds to a score is the real
+part of a random phasor, $cos theta$, and for $theta$ uniform on $m >= 3$
+equally spaced points, or on the circle,
+$EE[cos theta] = 0$ and $EE[cos^2 theta] = 1\/2 + EE[cos 2 theta]\/2 = 1\/2$.
+Against MAP's variance of 1 this halves the noise per dimension, but each
+component needs two counters. We therefore predicted no gain per bit and a
+doubling of capacity at fixed $n$.
+
+#datatable(
+  m5,
+  ("K", "f_n", "f_recall", "m_recall", "t_recall", "t_false", "tm_recall"),
+  ("K", "FHRR n", "FHRR same bits", "MAP same bits", "FHRR n=10⁴", "false", "MAP n=10⁴"),
+  [FHRR on the same facts. _FHRR n_ is the dimension affordable at the exact memory's bits.],
+) <tab-fhrr>
+
+Both predictions held (@tab-fhrr): at equal bits FHRR and MAP agree almost
+row for row, and at $n = "10,000"$ FHRR recalls
+#cell(m5, "K", 1000, "t_recall") at $K = "1,000"$ where MAP recalls
+#cell(m5, "K", 1000, "tm_recall"). The comparison at equal storage is thus
+not an artefact of a weak baseline: per bit, the strongest dense VSA is no
+better.
+
+== Against an exact VSA <sec-dr>
+
+Deng and Raviv's atoms @dengraviv2025histogram are Reed–Solomon codewords
+over $FF_N$, $N = p^m$, mapped through a Hadamard code to $n = N^2$ roots of
+unity. With the key and the value each owning a block of the message, a
+bound pair has code dimension $k = ceil(log_N U) + ceil(log_N V)$, and in
+the noiseless case their bound recovers $u <= floor((N - 1)\/(k - 1))$
+superposed pairs. Hence $n >= (u (k - 1) + 1)^2$: storage grows at least
+quadratically in the number of facts. We take their noiseless bound, charge
+each bundle entry only its information content
+$ceil(log_2 binom(u + p - 1, p - 1))$ bits, and choose the cheapest prime
+power $N <= 2^14$; all three choices favour them.
+
+#datatable(
+  m7,
+  ("K", "ex_bits", "dr_bits", "ratio", "field", "k"),
+  ("K", "exact bits", "Deng–Raviv bits", "÷ exact", "N", "k"),
+  [Bits to hold the same $K$ facts. Binary fields were cheapest at every load.],
+) <tab-dr>
+
+The ratio grows from #cell(m7, "K", 10, "ratio") at 10 facts to
+#cell(m7, "K", 3000, "ratio") at 3,000 (@tab-dr). What the premium buys is
+real: their memory survives corrupted entries, ours does not. The two
+constructions sit at opposite corners — exact at the information floor and
+fragile, or exact under noise at quadratic cost.
+
+== Holistic operations
+
+Records have $m$ roles, each with its own vocabulary of 100 fillers; analogy
+pairs share no filler, as in @kanerva2010dollar. MAP computes analogy as
+clean-up of $x dot.o A dot.o B$, the agreeing-role count as
+$"round"(A dot B \/ n)$, and re-binding by reading with clean-up and
+rewriting.
+
+#datatable(
+  h1,
+  ("m", "ex", "ex_bits", "an", "ag", "rb", "map_bits", "an_m"),
+  ("roles m", "exact (all ops)", "exact bits", "MAP analogy", "MAP agreeing", "MAP re-bind", "MAP bits", "MAP same bits: analogy"),
+  [Exact holistic operations against MAP at $n = "10,000"$ (correct of 100) and at the exact records' bits.],
+) <tab-holistic>
+
+The exact operations are correct in every trial (@tab-holistic). MAP's
+mapping vector carries $m^2$ cross terms, so its analogy accuracy falls from
+#cell(h1, "m", 10, "an")% at $m = 10$ to #cell(h1, "m", 100, "an")% at
+$m = 100$, while using #fmt(at-k(h1, "m", 100).map_bits) bits against the
+exact record's #fmt(at-k(h1, "m", 100).ex_bits).
+
+= Limitations <sec-limits>
+
+- *No noise tolerance.* One flipped bit of $N$ or $D$ corrupts the whole
+  memory. Graceful degradation, the main virtue of VSAs, is absent by
+  construction.
+- *Query cost grows with the memory.* Recall reduces an integer of
+  $approx 2 sum log_2 q$ bits modulo $q$: linear in the memory's size, not
+  constant like a hash table.
+- *Keys are primes and bound values.* Symbols need a prime dictionary, and
+  values must be smaller than every key that may hold them.
+- *No similarity between values.* Atoms are not similarity-preserving; the
+  memory answers equality, not nearness.
+- *What is new is narrow.* The algebra (partial fractions, the CRT,
+  prime-product sets) is classical, and the secure lock already stores
+  values this way. Our contribution is the VSA interface — superposition,
+  unbinding, holistic queries — as rational arithmetic, its proofs, and the
+  measured comparison.
+
+= Conclusion
+
+Superposition does not have to be noisy. Writing a key–value memory as one
+reduced fraction gives exact recall, exact absence, and merge and delete as
+arithmetic, at about 1.3× the information floor; its denominator turns
+value queries, analogy and role agreement into one subtraction each. It does
+not re-bind holistically, and cannot. Against VSAs at equal storage, the
+noisy ones fail and the exact one costs orders of magnitude more, buying
+noise tolerance. The practical question this leaves is the one a dictionary
+never asks: which applications want VSA-style operations _and_ exactness —
+symbolic reasoning over small structured records is the natural candidate.
+
+*Reproducibility.* The library (`rhind.memory`), the proofs
+(001, 002) and their data files are in the accompanying repository;
+rerunning a proof regenerates its report and data, and recompiling this
+document regenerates every table.
+
+#bibliography("refs.bib", style: "ieee")

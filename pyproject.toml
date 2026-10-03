@@ -1,0 +1,29 @@
+[project]
+name = "rhind"
+version = "0.1.0"
+description = "Exact vector-symbolic memory from partial fractions"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [{ name = "Abdullah Ali" }]
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+dependencies = []  # the library is pure Python: exact integers and Fractions
+
+[dependency-groups]
+dev = ["pytest>=8"]
+# The proofs compare against noisy VSAs (numpy as an int64 engine) and plot.
+proofs = ["numpy>=2.4", "matplotlib>=3.10"]
+
+[tool.uv]
+default-groups = ["dev", "proofs"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[build-system]
+requires = ["setuptools>=77.0"]  # 77+: SPDX license expressions (PEP 639)
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,172 @@
+{
+  "universe keys": 20000,
+  "values": 1000,
+  "rows": [
+    {
+      "K": 10,
+      "ours": {
+        "recall": "10/10",
+        "false_recalls": "0/500",
+        "bits": 299,
+        "query_us": 1,
+        "build_ms": 0
+      },
+      "dict_bits": 250,
+      "map_matched": {
+        "recall": "1/10",
+        "false_recalls": "500/500",
+        "bits": 295,
+        "query_us": 37,
+        "n": 59
+      },
+      "map_10000": {
+        "recall": "10/10",
+        "false_recalls": "0/500",
+        "bits": 50000,
+        "query_us": 7370
+      }
+    },
+    {
+      "K": 30,
+      "ours": {
+        "recall": "30/30",
+        "false_recalls": "0/500",
+        "bits": 931,
+        "query_us": 0,
+        "build_ms": 0
+      },
+      "dict_bits": 750,
+      "map_matched": {
+        "recall": "4/30",
+        "false_recalls": "500/500",
+        "bits": 930,
+        "query_us": 70,
+        "n": 155
+      },
+      "map_10000": {
+        "recall": "30/30",
+        "false_recalls": "0/500",
+        "bits": 60000,
+        "query_us": 6925
+      }
+    },
+    {
+      "K": 100,
+      "ours": {
+        "recall": "100/100",
+        "false_recalls": "0/500",
+        "bits": 3181,
+        "query_us": 1,
+        "build_ms": 0
+      },
+      "dict_bits": 2500,
+      "map_matched": {
+        "recall": "10/100",
+        "false_recalls": "500/500",
+        "bits": 2779,
+        "query_us": 177,
+        "n": 397
+      },
+      "map_10000": {
+        "recall": "100/100",
+        "false_recalls": "0/500",
+        "bits": 70000,
+        "query_us": 7180
+      }
+    },
+    {
+      "K": 300,
+      "ours": {
+        "recall": "300/300",
+        "false_recalls": "0/500",
+        "bits": 9740,
+        "query_us": 2,
+        "build_ms": 0
+      },
+      "dict_bits": 7500,
+      "map_matched": {
+        "recall": "31/300",
+        "false_recalls": "500/500",
+        "bits": 6818,
+        "query_us": 423,
+        "n": 974
+      },
+      "map_10000": {
+        "recall": "293/300",
+        "false_recalls": "420/500",
+        "bits": 80000,
+        "query_us": 7027
+      }
+    },
+    {
+      "K": 1000,
+      "ours": {
+        "recall": "500/500",
+        "false_recalls": "0/500",
+        "bits": 32546,
+        "query_us": 6,
+        "build_ms": 2
+      },
+      "dict_bits": 25000,
+      "map_matched": {
+        "recall": "43/500",
+        "false_recalls": "500/500",
+        "bits": 26622,
+        "query_us": 1614,
+        "n": 2958
+      },
+      "map_10000": {
+        "recall": "241/500",
+        "false_recalls": "500/500",
+        "bits": 80000,
+        "query_us": 6967
+      }
+    },
+    {
+      "K": 3000,
+      "ours": {
+        "recall": "500/500",
+        "false_recalls": "0/500",
+        "bits": 97401,
+        "query_us": 18,
+        "build_ms": 24
+      },
+      "dict_bits": 75000,
+      "map_matched": {
+        "recall": "32/500",
+        "false_recalls": "500/500",
+        "bits": 67428,
+        "query_us": 5274,
+        "n": 7492
+      },
+      "map_10000": {
+        "recall": "40/500",
+        "false_recalls": "500/500",
+        "bits": 90000,
+        "query_us": 7046
+      }
+    },
+    {
+      "K": 10000,
+      "ours": {
+        "recall": "500/500",
+        "false_recalls": "0/500",
+        "bits": 324958,
+        "query_us": 62,
+        "build_ms": 256
+      },
+      "dict_bits": 250000,
+      "map_matched": {
+        "recall": "20/500",
+        "false_recalls": "500/500",
+        "bits": 216630,
+        "query_us": 15323,
+        "n": 21663
+      }
+    }
+  ],
+  "P4 ops": 2000,
+  "P4 final memory equals rebuild": true,
+  "P4 every fact recalls": true,
+  "P4 facts at end": 2302
+}
