@@ -120,7 +120,8 @@ with a value) and _bundling_ (a sum, superposing many facts in one vector)
 @plate1995hrr @kanerva2009hd @kleyko2022survey1. Unbinding a key from a
 bundle returns its value plus cross-talk from every other fact, and a
 _clean-up_ against the codebook removes the noise while the load is low. The
-capacity of this scheme is well understood @frady2018capacity: noise grows
+capacity of this scheme is well understood @thomas2021hdtheory
+@clarkson2023capacity @frady2018capacity: noise grows
 with the number of stored facts, so recall degrades gracefully and false
 recalls appear.
 
@@ -161,8 +162,8 @@ decomposition of the sum is unique, and every fact is recoverable.
 multiply–add–permute (MAP) and its variants, Fourier HRR (FHRR) and others
 are surveyed in @kleyko2022survey1 @kleyko2022survey2 and compared
 empirically in @schlegel2022comparison. All trade exactness for a fixed
-dimension; capacity is analysed in @frady2018capacity @thomas2021hdtheory
-@clarkson2023capacity, and resonator networks @frady2020resonator factor
+dimension; capacity is analysed in general in @thomas2021hdtheory
+@clarkson2023capacity and for superposed sequences in @frady2018capacity, and resonator networks @frady2020resonator factor
 superposed structures. We compare against MAP-I @gayler2003vsa
 @schlegel2022comparison (integer bundling) and against FHRR @plate1995hrr
 with phases on the 4th roots of unity, which is the modular composite
@@ -464,8 +465,8 @@ keys at $K = 300$, and recalls #cell(m1, "K", 1000, "t_recall") at
 $K = "1,000"$. A recall is one big-integer reduction, faster than MAP's
 clean-up here (#cell(m1, "K", 3000, "ex_us") µs at $K = "3,000"$ against
 #cell(m1, "K", 3000, "m_us") µs) but far slower than a hash map
-(@sec-classical). At about 33 bits per fact a noisy VSA is far below its
-capacity @clarkson2023capacity, so the failure at equal bits is expected;
+(@sec-classical). At about 33 bits per fact a noisy VSA is loaded far
+beyond its capacity @clarkson2023capacity, so the failure at equal bits is expected;
 the comparison shows the scale of the gap, not a surprise. Random sequences of
 #fmt(m4.rows.at(0).ops) inserts, deletes and merges leave the memory equal to
 one rebuilt from scratch.
