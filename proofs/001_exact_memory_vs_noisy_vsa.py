@@ -1,5 +1,5 @@
 """
-001 — An exact associative memory beats a noisy VSA at every size and budget
+001 — An exact associative memory against noisy VSAs, at equal storage and at n = 10,000
 
 Promoted from exploration 036 (explorations/). Library: rhind.memory (ExactMemory).
 
@@ -24,6 +24,9 @@ Predictions, on record BEFORE running (exploration 036 measured them):
       MAP-I's clean-up (milliseconds).
   P4  Any sequence of inserts, deletes and merges leaves the memory equal to
       one rebuilt from scratch.
+      (Extended 2026-10-04 after a second cold review: the sequence now also
+      merges batches at keys already present, where values add mod q and a
+      value reaching 0 removes its key; before, every merge was disjoint.)
 
 Added 2026-10-03 after a cold review (its check c02 computed these): the
 packed table is not the information floor. K facts as an unordered set of
@@ -195,7 +198,7 @@ def _deng_raviv_bits(u, n_max=1 << 14):
 
 
 @proof_report(
-    title="001 — An exact associative memory beats a noisy VSA at every size and budget",
+    title="001 — An exact associative memory against noisy VSAs, at equal storage and at n = 10,000",
     source=__file__,
 )
 def run():
@@ -422,7 +425,9 @@ def run():
             "tolerance, which the exact memory does not have",
         )
 
-    @verified_section("P4 — exact under any sequence of inserts, deletes and merges")
+    @verified_section(
+        "P4 — exact under a random sequence of inserts, deletes and merges, shared keys included"
+    )
     @table(
         headers=["ops", "facts", "equal", "recall"],
         labels=[
@@ -443,9 +448,19 @@ def run():
                 if q not in truth:
                     truth[q] = rng.randrange(1, V)
                     mem += ExactMemory.build({q: truth[q]})
-            elif r < 0.8:
+            elif r < 0.7:
                 q = rng.choice(sorted(truth))
                 mem -= ExactMemory.build({q: truth.pop(q)})
+            elif r < 0.85:
+                shared = {
+                    q: rng.randrange(1, q)
+                    for q in rng.sample(sorted(truth), min(5, len(truth)))
+                }
+                for q, v in shared.items():
+                    truth[q] = (truth[q] + v) % q
+                    if truth[q] == 0:
+                        del truth[q]
+                mem += ExactMemory.build(shared)
             else:
                 batch = {
                     q: rng.randrange(1, V)

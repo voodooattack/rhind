@@ -23,7 +23,7 @@ Predictions, on record BEFORE running (exploration 043 measured them):
       clean-up against that attribute's 27 leaves in both records):
       ≥ 99% at n = 10,000 for every m; < 50% at the exact record's bits.
   P3  The exact record is under 1/10 of MAP-I's bits at n = 10,000.
-  P4  Frequent concepts on small primes (banana-lab proof 128's order) is
+  P4  Frequent concepts on small primes (a Huffman-like order) is
       Huffman-like: sparse records over 1,000 attributes, attribute i present
       with probability 1/(i + 1), values 3-level paths with choices 1…3;
       summed fraction-mode size (numerator + reduced denominator) over 2,000

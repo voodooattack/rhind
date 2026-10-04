@@ -265,3 +265,11 @@ def test_build_by_product_tree_matches_the_direct_sum():
         N = sum(v * (D // q) for q, v in facts.items()) % D
         mem = ExactMemory.build(facts)
         assert (mem.N, mem.D) == (N, D)
+
+
+def test_project_refuses_composite_keys_and_ignores_duplicates():
+    mem = ExactMemory.build({11: 3, 13: 5, 17: 7})
+    with pytest.raises(ValueError, match="not prime"):
+        mem.project([11, 143])
+    sub = mem.project([11, 11, 17])
+    assert sub == ExactMemory.build({11: 3, 17: 7})

@@ -49,3 +49,11 @@ def test_factor_finds_exactly_the_dictionary_primes():
     for p in ps:
         D *= p
     assert sorted(DIC.factor(D * 2**5)) == sorted(ps)
+
+
+def test_is_prime_rejects_the_twelve_base_pseudoprime():
+    """ψ₁₂ fools Miller–Rabin with bases 2 … 37; base 41 catches it."""
+    psi12 = 318665857834031151167461
+    assert psi12 == 399165290221 * 798330580441
+    assert not is_prime(psi12)
+    assert is_prime(399165290221) and is_prime(798330580441)

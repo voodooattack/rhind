@@ -1,5 +1,5 @@
 """
-002 — Exact holistic operations, and why re-binding cannot be one
+002 — Exact holistic operations, and why re-binding has no additive form
 
 Promoted from exploration 037 (explorations/). Library: rhind.memory
 (ExactMemory.key_bag / holding / analogy / agreeing / rebind).
@@ -100,7 +100,7 @@ class _Map:
 
 
 @proof_report(
-    title="002 — Exact holistic operations, and why re-binding cannot be one",
+    title="002 — Exact holistic operations, and why re-binding has no additive form",
     source=__file__,
 )
 def run():

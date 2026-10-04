@@ -5,7 +5,7 @@ Promoted from exploration 041 (explorations/). Library: rhind.memory.
 
 A memory is F = N/D with D = ∏ keys (proof 001 stores both). When the key
 set is known from a rule, as for a record whose roles are always the first
-m primes above the value range (the linear structural primes q = 2d + 3),
+m primes above the value range,
 D can be recomputed and only N stored:
 
     encode  N = Σ v_q · (D/q)  mod D        (values 0 ≤ v < V < every q;

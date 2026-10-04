@@ -505,8 +505,8 @@ class _ReportBuilder:
         lines.append(f"> Source hash: `sha256:{self.proof_hash.full}`")
         lines.append("> This report was produced as a side effect of verification.")
         lines.append(
-            "> Its existence certifies that all claims below were "
-            "computationally verified."
+            "> It exists only if every assertion in the source passed; "
+            "what each assertion checks is stated in the source."
         )
         lines.append(
             f"> To re-verify: run the source file and compare the "

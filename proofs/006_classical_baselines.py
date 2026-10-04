@@ -1,5 +1,5 @@
 """
-006 — Against ordinary data structures, the exact memory wins on nothing measurable
+006 — Against ordinary data structures: no cost advantage measured
 
 Added 2026-10-03 after a cold review asked the question the paper had not:
 why use this instead of an ordinary data structure? Its checks c04 and c06
@@ -121,7 +121,7 @@ def _schema_N(vals, keys, D):
 
 
 @proof_report(
-    title="006 — Against ordinary data structures, the exact memory wins on nothing measurable",
+    title="006 — Against ordinary data structures: no cost advantage measured",
     source=__file__,
 )
 def run():

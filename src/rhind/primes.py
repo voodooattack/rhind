@@ -2,7 +2,7 @@
 
 from math import isqrt
 
-_SMALL = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
+_SMALL = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41)
 
 
 def odd_primes(n: int, start_after: int = 2) -> list:
@@ -23,7 +23,13 @@ def odd_primes(n: int, start_after: int = 2) -> list:
 
 
 def is_prime(n: int) -> bool:
-    """Deterministic Miller–Rabin for n < 3.3·10²⁴ (bases: the first 12 primes)."""
+    """Miller–Rabin with the first 13 primes as bases (2 … 41).
+
+    Deterministic, hence exact, for n < ψ₁₃ = 3,317,044,064,679,887,385,961,981
+    (Sorenson and Webster, Math. Comp. 86 (2017)); above that it is a strong
+    probable-prime test. The first 12 bases alone are fooled by
+    ψ₁₂ = 318,665,857,834,031,151,167,461 = 399,165,290,221 · 798,330,580,441,
+    which an earlier version accepted (cold review, 2026-10-04)."""
     if n < 2:
         return False
     for p in _SMALL:

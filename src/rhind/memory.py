@@ -171,8 +171,15 @@ class ExactMemory:
 
     def project(self, keys) -> "ExactMemory":
         """The sub-memory on the given prime keys (those present), one CRT step:
-        F = A/D_S + B/D_R  ⇒  A ≡ N · D_R⁻¹ (mod D_S)."""
-        D_S = prod(q for q in set(keys) if self.D % q == 0)
+        F = A/D_S + B/D_R  ⇒  A ≡ N · D_R⁻¹ (mod D_S).
+
+        Keys must be prime (duplicates are ignored): a composite key such as
+        143 = 11·13 would square a prime in D_S and build an invalid memory."""
+        keys = set(keys)
+        for q in keys:
+            if not _is_key(q):
+                raise ValueError(f"key {q} is not prime")
+        D_S = prod(q for q in keys if self.D % q == 0)
         if D_S == 1:
             return ExactMemory()
         D_R = self.D // D_S

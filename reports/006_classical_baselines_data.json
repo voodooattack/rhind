@@ -1,5 +1,5 @@
 {
- "title": "006 — Against ordinary data structures, the exact memory wins on nothing measurable",
+ "title": "006 — Against ordinary data structures: no cost advantage measured",
  "sections": [
   {
    "title": "P1–P2 — same answers, and the size of each representation",
@@ -88,98 +88,98 @@
     {
      "m": 10,
      "op": "get",
-     "frac": 360,
-     "schema": 305,
-     "packed": 132,
-     "dict": 56
+     "frac": 372,
+     "schema": 294,
+     "packed": 135,
+     "dict": 60
     },
     {
      "m": 10,
      "op": "holding",
-     "frac": 3780,
+     "frac": 3888,
      "schema": "—",
-     "packed": 221,
-     "dict": 299
+     "packed": 223,
+     "dict": 290
     },
     {
      "m": 10,
      "op": "agreeing",
-     "frac": 2239,
+     "frac": 2253,
      "schema": "—",
-     "packed": 273,
-     "dict": 458
+     "packed": 275,
+     "dict": 457
     },
     {
      "m": 10,
      "op": "merge",
-     "frac": 1927,
-     "schema": 95,
-     "packed": 60,
-     "dict": 144
+     "frac": 1959,
+     "schema": 93,
+     "packed": 61,
+     "dict": 143
     },
     {
      "m": 100,
      "op": "get",
-     "frac": 513,
-     "schema": 566,
-     "packed": 146,
-     "dict": 55
+     "frac": 551,
+     "schema": 562,
+     "packed": 145,
+     "dict": 57
     },
     {
      "m": 100,
      "op": "holding",
-     "frac": 9456,
+     "frac": 9511,
      "schema": "—",
-     "packed": 284,
-     "dict": 1971
+     "packed": 298,
+     "dict": 1861
     },
     {
      "m": 100,
      "op": "agreeing",
      "frac": 5476,
      "schema": "—",
-     "packed": 327,
-     "dict": 3732
+     "packed": 355,
+     "dict": 3718
     },
     {
      "m": 100,
      "op": "merge",
-     "frac": 3348,
-     "schema": 123,
+     "frac": 3367,
+     "schema": 126,
      "packed": 64,
-     "dict": 669
+     "dict": 677
     },
     {
      "m": 1000,
      "op": "get",
-     "frac": 3281,
-     "schema": 3692,
-     "packed": 234,
-     "dict": 64
+     "frac": 3279,
+     "schema": 3688,
+     "packed": 230,
+     "dict": 65
     },
     {
      "m": 1000,
      "op": "holding",
-     "frac": 234831,
+     "frac": 234007,
      "schema": "—",
-     "packed": 1113,
-     "dict": 17896
+     "packed": 1125,
+     "dict": 17038
     },
     {
      "m": 1000,
      "op": "agreeing",
-     "frac": 205085,
+     "frac": 204927,
      "schema": "—",
-     "packed": 1188,
-     "dict": 38844
+     "packed": 1201,
+     "dict": 38168
     },
     {
      "m": 1000,
      "op": "merge",
-     "frac": 59404,
-     "schema": 888,
-     "packed": 128,
-     "dict": 6952
+     "frac": 59358,
+     "schema": 894,
+     "packed": 121,
+     "dict": 7164
     }
    ],
    "findings": [

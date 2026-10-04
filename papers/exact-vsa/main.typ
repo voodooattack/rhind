@@ -76,7 +76,7 @@
 
 #align(center)[
   #text(size: 16pt, weight: "bold")[An Exact Superposed Key–Value Memory in One Rational] \
-  #text(size: 12pt)[with exact holistic queries]
+  #text(size: 12pt)[and its self-describing key set]
   #v(4pt)
   Abdullah Ali \
   #text(size: 9pt)[Independent researcher · #link("mailto:voodooattack@gmail.com")[voodooattack\@gmail.com]]
@@ -88,28 +88,33 @@
 #block(inset: (x: 1.2cm))[
   #set text(size: 9.5pt)
   *Abstract.* Vector symbolic architectures (VSAs) superpose key–value facts
-  in one vector and pay for it with noise. We study the exact counterpart: a
+  in one vector and pay for it with noise. We study an exact superposed
   memory that is one reduced fraction, $F = sum v_q \/ q mod 1$, with
-  distinct prime keys $q$ and values $1 <= v < q$. Recall is one modular
-  inversion, absence is non-divisibility of the denominator, and merge and
-  delete are addition and subtraction. The integer form of this construction
-  is classical — CRT-encoded database records (Davida et al., 1981) and the
-  secure lock — and the structure behind it is the primary decomposition of
-  $QQ\/ZZ$. What the fraction form adds is that the denominator _is_ the key
-  set, and that gives exact holistic queries as arithmetic: every key
-  holding a value, analogy, and the set of agreeing roles, each from one
-  subtraction and a denominator; with prime-power keys, the depth of
-  agreement of every role at once. We prove that no additive operation
-  re-binds a value from one key to another, since $"Hom"(ZZ\/p, ZZ\/q) = 0$.
-  We are explicit about what this is not. It is not a better data
-  structure: a packed record answers every operation we measure faster and
-  in fewer bits, and a hash map faster (#op(1000, "holding", "packed") ns against
-  #op(1000, "holding", "frac") ns for a value query over 1,000 roles). It is
-  not a full VSA: it has no binding of atoms into new atoms, no nesting and
-  no sequences. And it has no noise tolerance. Against VSAs at equal storage
-  the noisy ones fail; at $n = "10,000"$ dimensions MAP-I matches every exact
-  holistic answer when given the same two-step procedure, at
-  #calc.quo(at-k(h1, "m", 100).map_bits, at-k(h1, "m", 100).ex_bits) to #calc.quo(at-k(h1, "m", 3).map_bits, at-k(h1, "m", 3).ex_bits) times the bits. Every number is produced by executable proofs.
+  distinct prime keys $q$ and values $1 <= v < q$: recall is a few modular
+  reductions, absence is non-divisibility of the denominator, and merge and
+  delete are addition and subtraction. The integer form of this
+  construction is classical — CRT-encoded database records (Davida et al.,
+  1981) — and the structure behind it is the primary decomposition of
+  $QQ\/ZZ$. What the fraction adds is a _self-describing key set_: the
+  denominator is the product of the keys present, so a memory over an open
+  or sparse set of keys detects absence without a schema and merges with
+  any other by addition (values at shared keys add), with no layout to
+  agree on beyond the map from symbols to primes. Reading that
+  denominator also gives holistic queries — which roles hold a value,
+  analogy, agreeing roles, and, with prime-power keys, every role's depth of
+  agreement — though a fixed-layout packed record answers the same queries
+  with a few word operations. The price of the key-set readout is
+  transport: the components it needs have coprime orders, so no additive
+  operation moves a value between keys. We are explicit about the rest. The
+  memory is not a better data structure: on fixed records a packed record
+  is smaller than the fraction and faster at every operation we measure
+  (#op(1000, "holding", "packed") ns against #op(1000, "holding", "frac") ns to find which of
+  1,000 roles hold a value; a hash map takes #op(1000, "holding", "dict") ns). It is not a full VSA,
+  and it has no noise tolerance. At $n = "10,000"$ dimensions, MAP-I
+  matches every analogy and agreeing-set answer when given the same
+  two-step procedure (@tab-holistic), at
+  #calc.quo(at-k(h1, "m", 100).map_bits, at-k(h1, "m", 100).ex_bits) to #calc.quo(at-k(h1, "m", 3).map_bits, at-k(h1, "m", 3).ex_bits) times the bits. Every number is produced by executable
+  proofs.
 ]
 
 = Introduction
@@ -128,33 +133,33 @@ recalls appear.
 The attraction of VSAs is not lookup — a dictionary does that — but
 operations on whole structures: analogy through a mapping vector
 @kanerva2010dollar, similarity between composite records, re-binding a role.
-This paper asks what those operations look like when the memory is exact,
-and answers with an algebra rather than a faster structure: we show at the
-end (@sec-classical) that ordinary data structures beat this memory on
-every cost we measure.
+This paper asks what those operations look like when the memory is exact
+and its key set is not fixed in advance. The answer is an algebra rather
+than a faster structure: on fixed records, ordinary data structures beat
+this memory on every cost we measure (@sec-classical); what the fraction
+offers is that its denominator names the keys it holds.
 
-Our answer uses rational numbers. Superposition is fraction addition; the
+The construction uses rational numbers. Superposition is fraction addition; the
 key of a fact is the prime in its denominator; the value is the residue in
 its numerator. Because distinct primes are coprime, the partial-fraction
 decomposition of the sum is unique, and every fact is recoverable.
 
 *Contributions.*
 - The memory $F = sum v_q \/ q mod 1$, with recall, absence, merge and
-  delete as arithmetic (@sec-memory), placed against its integer
-  ancestors @davida1981subkeys @chiou1989lock; why the keys must be prime;
-  and a _schema mode_ that stores the numerator alone.
-- Exact holistic operations — all keys holding a value, analogy, agreeing
-  roles — each one subtraction and a denominator (@sec-holistic); and with
-  prime-power keys, graded nearness: every role's depth of agreement from one
-  subtraction, over shared concepts and shared ancestry at once
-  (@sec-graded).
-- A proof that no additive operation on such a memory re-binds a value
-  between keys (@sec-rebind).
+  delete as arithmetic, placed against its integer ancestors
+  @davida1981subkeys @chiou1989lock (@sec-memory). Its distinguishing
+  property is the self-describing key set: $D$ is the product of the keys
+  present. We say exactly what prime keys buy, and give a _schema mode_
+  that stores the numerator alone when the key set is fixed.
+- Holistic queries read from the denominator — which roles hold a value,
+  analogy, agreeing roles (@sec-holistic) — and, with prime-power keys,
+  graded nearness over shared concepts and shared ancestry (@sec-graded).
+- The trade-off behind re-binding: the coprime components that make the
+  key set readable admit no additive map between them (@sec-rebind).
 - Measurements, every number from an executable proof (@sec-experiments):
-  against MAP-I and FHRR at equal storage and at $n = "10,000"$, with both
-  one-shot and two-step VSA procedures; against the exact VSA of Deng and
-  Raviv @dengraviv2025histogram; and against a packed record and a hash map,
-  which win on cost (@sec-classical).
+  against MAP-I and FHRR with one-shot and two-step procedures, against
+  the exact VSA of Deng and Raviv @dengraviv2025histogram, and against a
+  packed record and a hash map, which win on cost (@sec-classical).
 
 = Related work <sec-related>
 
@@ -166,8 +171,21 @@ dimension; capacity is analysed in general in @thomas2021hdtheory
 @clarkson2023capacity and for superposed sequences in @frady2018capacity, and resonator networks @frady2020resonator factor
 superposed structures. We compare against MAP-I @gayler2003vsa
 @schlegel2022comparison (integer bundling) and against FHRR @plate1995hrr
-with phases on the 4th roots of unity, which is the modular composite
-representation of Snaider and Franklin @snaider2014mcr with $r = 4$.
+with phases on the 4th roots of unity. Its atoms and binding are those of
+the modular composite representation of Snaider and Franklin
+@snaider2014mcr with $r = 4$; unlike MCR, we do not quantise bundles back
+to $ZZ\/4$.
+
+*Exact linear memories.* Superposition is exact in a linear memory whose
+keys are orthonormal: correlation-matrix memories @kohonen1972cmm
+@anderson1972memory and tensor-product representations
+@smolensky1990tpr recover every stored value exactly when the dimension is
+at least the number of keys, and they re-bind by a linear map. They are the
+standard exact counterpart of VSA superposition. Their cost is the
+dimension: one per key, fixed in advance, where our memory names its keys
+in its denominator. Decoding superposed VSA structures is analysed in
+@kleyko2023decoding, and sparse block codes give another binding scheme
+@frady2023sparse.
 
 *Residue VSAs.* Kymn et al. @kymn2023residue encode integers as phasor
 vectors whose frequencies are roots of unity for a set of moduli, so that
@@ -205,7 +223,9 @@ by hashing, with insert, delete and difference as addition and
 subtraction, and reconcile sets by subtracting tables
 @eppstein2011difference. They are the closest data-structure analogue of
 merge and difference here, and are cheaper; we do not compete with them on
-cost (@sec-classical).
+cost (@sec-classical). Fixed-layout records answer field-wise queries with
+whole-word instructions @lamport1975multibyte @knuth2011taocp4a; that is
+our packed-record baseline.
 
 *Prime-product encodings.* Encoding concepts as primes and a set or a type
 as their product, with subsumption by divisibility, is used for ontologies
@@ -237,6 +257,9 @@ key and $1 <= v < q$. A memory holding facts $\{(q, v_q) : q in Q\}$ is
 
 $ F = sum_(q in Q) v_q / q mod 1 = N / D, quad gcd(N, D) = 1, quad 0 <= N < D. $ <eq-memory>
 
+We write $"den"(x)$ for the denominator of $x mod 1$ in lowest terms, so
+$"den"(F) = D$.
+
 #theorem("Proposition 1 (structure and recall)")[
   $D = product_(q in Q) q$, and for each $q in Q$,
   $v_q equiv N dot (D\/q)^(-1) (mod q)$.
@@ -252,8 +275,10 @@ $ F = sum_(q in Q) v_q / q mod 1 = N / D, quad gcd(N, D) = 1, quad 0 <= N < D. $
 
 Proposition 1 is the primary decomposition of $QQ\/ZZ$ into its
 $p$-components @fuchs1970groups, restricted to denominators with each prime
-at most once; we state it because everything below rests on it. Recall is
-therefore one multiplication and one reduction modulo $q$.
+at most once; we state it because everything below rests on it. Recall
+therefore needs $(D\/q) mod q$ (one reduction of $D$), its inverse modulo
+$q$, and $N mod q$: linear in the memory's length, as is every operation
+below.
 A key $p$ is _absent_ exactly when $p divides.not D$, so the memory answers
 "not stored" without false positives. Facts are added and removed by
 $F plus.minus v\/q$, and a fact is removed by subtracting its exact value,
@@ -263,21 +288,22 @@ key the values add ($A + A$ doubles every value, and values summing to $q$
 remove the key), so $gcd(D_A, D_B) > 1$ flags keys the two memories
 _share_; which of those hold equal values is the agreeing-roles query of
 @sec-holistic.
-Projecting onto a subset $R subset Q$ is one CRT step.
+Projecting onto a subset $T subset Q$ is one CRT step.
 
 *Why primes.* Memories over prime keys form the group
 $plus.o.big_q ZZ\/q$, so every sum and difference is again a valid
-memory: values at a shared key add modulo $q$, and a value reaching $0$
-removes its key cleanly. Pairwise-coprime composite keys do not have this
-closure. With the key $15$, two admissible facts sum to an inadmissible
-one, $4\/15 + 1\/15 = 1\/3$, and the key collapses into a phantom key $3$;
-a non-unit value $5\/15 = 1\/3$ does the same directly. Keys sharing a
-factor alias outright: $1\/6 + 1\/10 = 4\/15 = 2\/3 + 3\/5$, so two
-different memories have the same fraction. What fails is a key mixing
-different primes. A prime power is sound ($5\/25 = 1\/5$ keeps the prime
-$5$ and records how many base-$5$ digits of the value are zero); that is
-the starting point of graded nearness (@sec-graded). Elsewhere we use
-prime keys.
+memory. Primality is more than closure needs: keys that are merely
+pairwise coprime (15, 22, 91, …) also give a group $plus.o.big ZZ\/m_i$
+inside $QQ\/ZZ$, and each value can still be read from its key's
+component. What primality buys is the self-describing key set. With a
+prime key every nonzero value is a unit, so the key's prime stays in $D$
+and $D$ is _exactly_ the product of the keys present; with the key 15, the
+value 5 reduces $5\/15$ to $1\/3$, and $D$ no longer names the key. What
+breaks a memory outright is keys that share a factor:
+$1\/6 + 1\/10 = 4\/15 = 2\/3 + 3\/5$, so two different memories have the
+same fraction. A prime power keeps its prime in $D$ ($5\/25 = 1\/5$
+keeps the prime $5$ and records how many base-$5$ digits of the value are
+zero); that is the starting point of graded nearness (@sec-graded).
 
 *Size.* $N < D$, so the memory takes at most $2 log_2 D = 2 sum_q log_2 q$
 bits. With keys the primes above the value range, this is about
@@ -336,8 +362,8 @@ empty ($v_q = 0$ for $q in R without Q$).
 
 An empty role keeps its prime in $"den"(F - x S)$ through the term $-x\/q$,
 although that prime is not in $D$; dividing $D$ alone is then wrong, which
-is why the statement uses $"lcm"(D, D_R)$. (Our first schema-mode
-experiment found exactly this error in an earlier version of the library.)
+is why the statement uses $"lcm"(D, D_R)$.#footnote[An experiment found
+exactly this error in an earlier version of our library.]
 
 One subtraction thus subtracts $x$ from every value at once, and the matches
 drop out of the denominator. "One subtraction" is one operation on big
@@ -382,8 +408,12 @@ with $nu_q$ the $q$-adic valuation.
   interact (Proposition 1).
 ]
 
-So one subtraction, against a probe record or another record, gives every
-role's depth at once. Depth defines an ultrametric, $q^(-j)$ (two values
+So one subtraction, against a probe record or another record, yields one
+denominator holding every role's depth; reading the depths out takes one
+$q$-adic valuation per key, each against a number as long as the memory.
+Absence is not readable in this mode: a value of $0$ gives the same memory
+as an empty role, and a value divisible by $q$ lowers the exponent of $q$
+in $D$, so graded memories need a schema. Depth defines an ultrametric, $q^(-j)$ with distance $0$ for equal values (two values
 agreeing to depths $i$ and $j$ with a third agree to depth _at least_
 $min(i, j)$ with each other). It
 means something only if the encoding puts meaning in the low digits: for a
@@ -397,16 +427,16 @@ key for _kind_ and to whatever depth the colour hierarchy shares at the key
 for _colour_, and one subtraction reports both. Shared keys are shared
 concepts (a bag), digits are shared ancestry (a tree) (@sec-concepts).
 
-== Re-binding is not holistic <sec-rebind>
+== Re-binding has no additive form <sec-rebind>
 
-Re-binding moves a value from key $p$ to key $q$. Call an operation on
-memories _holistic_ if it is additive (a $ZZ$-module map), as the VSA's
-re-binding is: multiply the bundle by $p dot.o q$, which works because all
-keys live in one group (and moves every other fact as well). Here they do
-not. The $p$-part of $F$ lives in
-$(1\/p) ZZ \/ ZZ tilde.equiv ZZ\/p$ and the $q$-part in $ZZ\/q$.
+Re-binding moves a value from key $p$ to key $q$. In a VSA it is a linear
+map on the whole memory — multiply the bundle by $p dot.o q$ — because all
+keys live in one group (it moves every other fact as well). Call an
+operation on memories _additive_ if it is a $ZZ$-module map. The queries above
+are not additive (they read a denominator); the question is
+whether re-binding can be.
 
-#theorem("Proposition 4")[
+#theorem("Observation")[
   For distinct primes $p$, $q$ every additive map $phi: ZZ\/p -> ZZ\/q$ is
   zero.
 ]
@@ -415,14 +445,18 @@ $(1\/p) ZZ \/ ZZ tilde.equiv ZZ\/p$ and the $q$-part in $ZZ\/q$.
   phi(0) = 0$ in $ZZ\/q$. As $p$ is invertible modulo $q$, $c = 0$.
 ]
 
-So no additive operation on the memory transfers a value between keys; an
-exact re-binding must read $v$ out to $ZZ$ (Proposition 1) and write
-$F - v\/p + v\/q$. Equivalently, every additive endomorphism of the
-memory group preserves its $p$-components @fuchs1970groups. The practical
-force is small — reading and writing costs a few big-integer operations —
-but it marks a structural boundary: the VSA's holistic re-binding is a
-consequence of the shared group that also makes it noisy, so exactness of
-this kind and holistic transport cannot be had together.
+Every additive endomorphism of $plus.o.big_q ZZ\/q$ therefore preserves
+each component @fuchs1970groups, and an exact re-binding must read $v$ out
+to $ZZ$ (Proposition 1) and write $F - v\/p + v\/q$, at about the cost of
+a holistic query. This is a property of this design, not of exactness: a
+packed record, $(ZZ\/2^w)^m$, is exact and moves a field by an additive
+map, and so does a linear memory with orthonormal keys @smolensky1990tpr.
+What excludes transport here is what makes the key set readable. Reading
+$D$ requires components of coprime order, and between components of
+coprime order every additive map is zero; transport needs components with
+a nonzero map between them, such as isomorphic ones, and those cannot be
+told apart by a denominator. In this memory the two properties exclude
+each other.
 
 = Experiments <sec-experiments>
 
@@ -444,8 +478,9 @@ up to 300 stored keys and 300 absent keys. *MAP-I* @schlegel2022comparison (belo
 MAP): bipolar atoms, binding by elementwise product, bundling by integer
 sum without thresholding, clean-up by integer dot product against all $V$
 value vectors, and "present" when the best score is at least $n\/2$. A VSA's
-bits are $n$ times the width of its largest counter. We report MAP at the
-exact memory's bits and at $n = "10,000"$.
+bits are $n$ times the width of its largest possible counter. We report MAP
+at _at most_ the exact memory's bits (sizing $n$ by the worst-case counter
+width leaves it 69–87% of them) and at $n = "10,000"$.
 
 == Against a bipolar VSA
 
@@ -467,9 +502,9 @@ clean-up here (#cell(m1, "K", 3000, "ex_us") µs at $K = "3,000"$ against
 #cell(m1, "K", 3000, "m_us") µs) but far slower than a hash map
 (@sec-classical). At about 33 bits per fact a noisy VSA is loaded far
 beyond its capacity @clarkson2023capacity, so the failure at equal bits is expected;
-the comparison shows the scale of the gap, not a surprise. Random sequences of
-#fmt(m4.rows.at(0).ops) inserts, deletes and merges leave the memory equal to
-one rebuilt from scratch.
+the comparison shows the scale of the gap, not a surprise. A random sequence
+of #fmt(m4.rows.at(0).ops) inserts, deletes and merges, including merges at
+keys already present, leaves the memory equal to one rebuilt from scratch.
 
 == Against FHRR
 
@@ -495,7 +530,7 @@ Both predictions held (@tab-fhrr): at equal bits FHRR and MAP agree almost
 row for row, and at $n = "10,000"$ FHRR recalls
 #cell(m5, "K", 1000, "t_recall") at $K = "1,000"$ where MAP recalls
 #cell(m5, "K", 1000, "tm_recall"). The comparison at equal storage is thus
-not an artefact of a weak baseline: per bit, the strongest dense VSA is no
+not an artefact of a weak baseline: per bit, a strong dense VSA is no
 better.
 
 == Against an exact VSA <sec-dr>
@@ -504,12 +539,13 @@ Deng and Raviv's atoms @dengraviv2025histogram are Reed–Solomon codewords
 over $FF_N$, $N = p^m$, mapped through a Hadamard code to $n = N^2$ roots of
 unity. With the key and the value each owning a block of the message, a
 bound pair has code dimension $k = ceil(log_N U) + ceil(log_N V)$, and in
-the noiseless case their bound recovers $u <= floor((N - 1)\/(k - 1))$
+the noiseless case their bound (their Eq. (10)) recovers $u <= floor((N - 1)\/(k - 1))$
 superposed pairs. Hence $n >= (u (k - 1) + 1)^2$: storage grows at least
 quadratically in the number of facts. We take their noiseless bound, charge
 each bundle entry only its information content
 $ceil(log_2 binom(u + p - 1, p - 1))$ bits, and choose the cheapest prime
-power $N <= 2^14$; all three choices favour them.
+power $N <= 2^14$. The first two choices favour them; the cap never binds
+(the same fields are chosen with $N <= 2^16$).
 
 #datatable(
   m7,
@@ -604,7 +640,13 @@ $r dot.o r = 1$, and only the whole-record similarity remains.
 ) <tab-graded>
 
 Every exact depth is right, from one subtraction, at #fmt(at-k(g1, "m", 100).ex_bits)
-bits for 100 roles against MAP's #fmt(at-k(g1, "m", 100).map_bits) bits, and
+bits for 100 roles (the numerator only: graded records are in schema mode)
+against MAP's #fmt(at-k(g1, "m", 100).map_bits) bits. The exact encoding is
+itself wasteful — base-$q$ digits with $q$ in the hundreds carry base-4
+choices, about 36 bits per role for 8 bits of information — and a packed
+record would hold the same paths in about 800 bits and find every depth by
+XOR and a count of trailing zero digit groups per field. We did not
+measure that baseline; it would win. Meanwhile
 MAP's probe query falls to #cell(g1, "m", 100, "map_q1") at 100 roles (@tab-graded). Inside
 one value the prefix shape is binding: packing four independent attributes
 into one value, its depth equals the number of shared attributes for exactly
@@ -660,7 +702,7 @@ pairs at every $m$.
   k3,
   ("m", "op", "frac", "schema", "packed", "dict"),
   ("roles m", "operation", "fraction", "schema N", "packed", "hash map"),
-  [Time per operation, integer nanoseconds (median of repetitions, CPython). Holding and agreeing are undefined on $N$ without $D$.],
+  [Time per operation, integer nanoseconds (median of repetitions, CPython). Holding and agreeing were not timed in schema mode, which first rebuilds $F = N\/D$ and then costs what the fraction costs.],
 ) <tab-classical-time>
 
 The packed record costs about what schema mode's $N$ costs, and the
@@ -677,10 +719,14 @@ not rescue it either: with keys hashed to random 61-bit primes, so that no
 dictionary is shared at all, it costs #cell(k5, "K", 1000, "ratio") a sorted
 list of (64-bit hash, value) pairs.
 
-So the exact memory has no cost advantage over an ordinary structure in any
-setting we measured. Its interest is the algebra: merge and difference as
-$+$ and $-$ on one number, the key set as its denominator, holistic queries
-and graded nearness as arithmetic, and the boundary of Proposition 4.
+So on fixed records the exact memory has no cost advantage over an ordinary
+structure in any setting we measured, and the packed record would also win
+on graded depth (@sec-graded-exp). What a fixed layout does not give is
+the self-describing key set: a memory over an open or sparse key set that
+detects absence without a schema and merges with any other by addition.
+That, with the denominator queries it enables and the trade-off of
+@sec-rebind, is the contribution; for sparse hashed keys its size cost is
+the #cell(k5, "K", 1000, "ratio") above.
 
 = Limitations <sec-limits>
 
@@ -697,15 +743,16 @@ and graded nearness as arithmetic, and the boundary of Proposition 4.
   record or a hash map is faster at every operation and smaller
   (@sec-classical).
 - *Not a full VSA.* There is no binding of two atoms into a new atom usable
-  as a key (a product of primes is composite, and composite keys break the
-  memory, @sec-memory), no nesting (a memory cannot be a value without keys
+  as a key (the key $p q$ shares a factor with the keys $p$ and $q$, and keys
+  sharing a factor break the memory, @sec-memory), no nesting (a memory cannot be a value without keys
   larger than it), and no permutation, hence no sequences. Values are
   bounded integers. These are central to what VSAs are used for
   @plate1995hrr; what we share with them is superposition, unbinding and
   holistic queries.
 - *Keys are primes and bound values.* Symbols need a prime dictionary
-  (composite keys break closure under addition, @sec-memory), and values
-  must be smaller than every key that may hold them.
+  (pairwise-coprime keys would keep the memory exact but lose the
+  self-describing key set, @sec-memory), and values must be smaller than
+  every key that may hold them.
 - *Nearness is structured, not geometric.* Atoms are not
   similarity-preserving. Nearness is shared concepts (keys) and shared
   ancestry (prefixes within a value, @sec-graded); similarity that is
@@ -714,25 +761,27 @@ and graded nearness as arithmetic, and the boundary of Proposition 4.
   primary decomposition of $QQ\/ZZ$, prime-product sets, p-adic encodings
   of hierarchies) is classical, and CRT records @davida1981subkeys already
   store values this way. Our contribution is the reduced fraction as a
-  superposed memory whose denominator is read: exact holistic queries and
-  graded nearness as arithmetic, the re-binding boundary, and an honest
-  measurement against both VSAs and ordinary structures.
+  superposed memory with a self-describing key set, the denominator queries
+  it enables, the re-binding trade-off, and a measurement against both VSAs
+  and ordinary structures.
 
 = Conclusion
 
 Superposition does not have to be noisy. A key–value memory written as one
 reduced fraction gives exact recall, exact absence, and merge and delete as
-arithmetic; its denominator turns value queries, analogy and role agreement
-into one subtraction each, and with $q$-adic precision it grades nearness
-over shared concepts and shared ancestry at once. It cannot re-bind
-holistically. It is not a faster or smaller data structure, and it is not a
-full VSA: it is an exact algebra for the holistic part of the VSA
-interface. Whether that algebra is useful beyond what it explains — for
-instance as a reference against which approximate VSA operations can be
-checked exactly — is the open question.
+arithmetic, and its denominator names the keys it holds: two memories over
+unrelated key sets merge by addition, and absence needs no schema. The
+same denominator answers holistic queries and, with prime-power keys,
+grades nearness; the coprime components that make it readable are also
+why no additive operation re-binds. It is not a faster or smaller data
+structure on fixed records, and not a full VSA. Whether a self-describing
+exact memory is useful beyond what it explains — as a reference against
+which approximate VSA operations can be checked, or where key sets are open
+and layouts cannot be agreed — is the open question.
 
-*Reproducibility.* The library (`rhind`), the proofs (001–006) and their
-data files are in the accompanying repository;
+*Reproducibility.* The library (`rhind`), the proof harness
+(`proofreport`), the proofs (001–006) and their data files are in the
+accompanying repository;
 rerunning a proof regenerates its report and data, and recompiling this
 document regenerates every table.
 
