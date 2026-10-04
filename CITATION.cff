@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "rhind: an exact superposed key–value memory in one rational"
+type: software
+authors:
+  - family-names: Ali
+    given-names: Abdullah
+    email: voodooattack@gmail.com
+repository-code: "https://github.com/voodooattack/rhind"
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-10-04
+keywords:
+  - vector symbolic architectures
+  - hyperdimensional computing
+  - Chinese remainder theorem
+  - partial fractions
+  - exact associative memory
+abstract: >-
+  A key–value memory written as one reduced fraction F = Σ v_q/q mod 1 over
+  distinct prime keys. Recall, absence, merge and delete are exact
+  arithmetic, and the denominator is the product of the keys present, so the
+  key set describes itself. Includes the library, the executable proofs
+  behind every claim, and the paper.
+preferred-citation:
+  type: article
+  title: "An Exact Superposed Key–Value Memory in One Rational, and Its Self-Describing Key Set"
+  authors:
+    - family-names: Ali
+      given-names: Abdullah
+  year: 2026
+  status: preprint

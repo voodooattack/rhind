@@ -131,13 +131,13 @@ def table(
 
     Example:
         @table(
-            headers=["d", "q_d", "w"],
-            labels=["Level", "q(d)", "Bit Width"],
-            align=["c", "c", "r"],
+            headers=["K", "bits", "ratio"],
+            labels=["Facts", "Bits", "÷ packed"],
+            align=["r", "r", "r"],
             legend={
-                "d": "Metallic level index",
-                "q_d": "Structural prime at level d: q(d) = 2d+3",
-                "w": "Encoding width in bits: 2(d+1)",
+                "K": "Number of stored facts",
+                "bits": "Size of the memory in bits",
+                "ratio": "Bits divided by the packed-table size",
             },
         )
     """

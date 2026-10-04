@@ -1,4 +1,4 @@
-# Exact VSA: literature survey (2026-10-02)
+# Exact VSA: literature survey (2026-10-02, revised 2026-10-04)
 
 Carried over from banana-lab, where the work began. Proof numbers are
 rhind's (001 = exact memory, 002 = holistic operations); explorations 036,
@@ -190,27 +190,78 @@ in a different form.** That frequent symbols should get the cheapest codes
 is Huffman's principle (and the rearrangement inequality); banana-lab's
 proof 128 used the same frequency order for gcd similarity.
 
+## 7. After two cold reviews (2026-10-03, 2026-10-04)
+
+Two independent reviews and a prior-art sweep changed several verdicts
+above. Where this section and an earlier one disagree, this one is current.
+
+**CRT records predate the secure lock.** Davida, Wells & Kam (ACM TODS
+1981) store a database record as one integer and read field i as C mod dᵢ.
+That is schema mode exactly. Chang uses one CRT integer as an ordered
+minimal perfect hash (CACM 1984) and as a key–lock matrix (BIT 1986). Wu,
+Lee & Hsu (ICDE 2004) label XML trees with primes and keep sibling order in
+CRT integers. Garner (1959) is the residue number system itself. Verdict
+for the memory's integer form: **known**.
+
+**The structure is the primary decomposition of ℚ/ℤ** (Fuchs, *Infinite
+Abelian Groups*). Proposition 1 and the re-binding observation are that
+decomposition stated for this memory. Verdict: **known**.
+
+**Holistic queries are not unique to the fraction.** A packed record
+answers "which roles hold x" and "which roles agree" with a constant number
+of whole-word operations (Lamport 1975; Knuth, TAOCP 4A), and graded depth
+the same way. Proof 006 measured the first two: the packed record is
+faster and smaller on fixed records. Verdict for "holistic queries as
+arithmetic": **known in a different form**. It is not the contribution.
+
+**Exact superposition is old.** Correlation-matrix memories (Kohonen 1972;
+Anderson 1972) and tensor-product representations (Smolensky 1990) are
+exact with orthonormal keys, at one dimension per key, and they re-bind
+linearly. Invertible Bloom lookup tables (Goodrich & Mitzenmacher 2011;
+Eppstein et al. 2011) superpose key–value pairs exactly with high
+probability, with + and − for insert, delete and difference, more cheaply.
+
+**Re-binding.** The old verdict, "known (textbook Hom)", stands for the
+lemma, but the paper's first framing ("exactness and holistic transport
+cannot coexist") was wrong. A packed record and an orthonormal linear
+memory are exact and transport additively. The correct statement is a
+trade-off of this design: the coprime components that make D readable
+admit no additive map between them.
+
+**Why primes.** Pairwise-coprime composite keys are also closed under
+addition and readable per key. What primes buy is that D is exactly the
+product of the keys present.
+
+**What remains apparently new** is the reduced fraction as a superposed
+memory with a **self-describing key set**: D names the keys present, so
+memories over open or sparse key sets detect absence without a schema and
+merge by addition. The denominator queries and the measurements come with
+it. FHRR on 4th roots of unity is the modular composite representation
+(Snaider & Franklin 2014) with r = 4, without bundle quantisation.
+
 ## Summary
 
 | Claim | Verdict |
 |---|---|
-| Memory storage and recall (001) | known in a different form (CRT secure lock) |
-| Absent-key detection, merge/delete as ± | apparently new framing of known math |
-| Beats MAP-I (001) | holds; FHRR no better per bit (001); Deng–Raviv 50–8,265× our bits, but noise-tolerant (040) |
-| holding / agreeing via denominator drop (002) | apparently new, shallow |
-| Exact analogy (002) | known in a different form (dictionary + reverse index) |
-| Re-binding must read (002) | known (textbook Hom) |
+| Memory storage and recall (001) | known (CRT records: Davida et al. 1981; secure lock 1989) |
+| Schema mode (003) | known (Davida et al. 1981) |
+| Self-describing key set: D names the keys present; absence and merge without a schema | apparently new as a superposed memory |
+| Beats MAP-I at equal bits (001) | holds, and is expected from capacity theory; FHRR no better per bit; Deng–Raviv 50–8,265× our bits, but noise-tolerant |
+| holding / agreeing / analogy via the denominator (002) | known in a different form: a packed record does them with word operations (006) |
+| MAP-I with the same two-step procedure (002) | matches analogy and the agreeing set at n = 10,000 |
+| No additive re-binding (002) | known lemma (Hom); a trade-off of this design, not of exactness |
 | Graded nearness: p-adic hierarchy encoding (004) | known in a different form (Murtagh 2016; Martins 2025) |
-| Graded nearness: every key's depth from one denominator (004, 005) | apparently new, shallow |
-| Frequent concepts on small primes (005) | known in a different form (Huffman; proof 128) |
-| Set sync | known (CPI); we tie it |
+| Graded nearness: every key's depth from one denominator (004, 005) | apparently new, shallow; a packed record would also do it |
+| Frequent concepts on small primes (005) | known in a different form (Huffman) |
+| Cost against ordinary structures (006) | no advantage measured on fixed records |
+| Set sync | known (CPI; IBLT); we tie neither |
 
-Bottom line: the lab has an exact, self-describing CRT dictionary whose VSA
-operations are rational arithmetic. The algebra is old. The interface,
-meaning denominator-as-key-set and the holistic queries via the denominator
-drop, is the unpublished part. A paper-shaped claim would be "exact VSA
-semantics for free from partial fractions", benchmarked against MAP-I and
-FHRR (proof 001) and Deng & Raviv (exploration 040).
+Bottom line (revised 2026-10-04): the algebra is old, and so is the integer
+form of the memory. The claim that survives two reviews is narrow: the
+reduced fraction as an exact superposed memory whose denominator names its
+keys. That self-describing key set lets memories over open or sparse key
+sets detect absence without a schema and merge by addition. The paper says
+so, and states plainly what the memory is not.
 
 ## Sources
 
@@ -226,3 +277,16 @@ FHRR (proof 001) and Deng & Raviv (exploration 040).
 - [Minsky, Trachtenberg & Zippel, set reconciliation (ADS)](https://ui.adsabs.harvard.edu/abs/2003ITIT...49.2213M/abstract)
 - [Murtagh, Sparse p-adic data coding (arXiv 1604.06961)](https://research.gold.ac.uk/18816/1/1604.06961v1.pdf)
 - [Martins, Learning with the p-adics (arXiv 2512.22692)](https://arxiv.org/abs/2512.22692)
+- Davida, Wells & Kam, "A database encryption system with subkeys", ACM TODS 6(2), 1981, doi:10.1145/319566.319580
+- Chang, "The study of an ordered minimal perfect hashing scheme", CACM 27(4), 1984, doi:10.1145/358027.358051
+- Chang, "On the design of a key-lock-pair mechanism…", BIT 26(4), 1986, doi:10.1007/BF01935048
+- Wu, Lee & Hsu, "A prime number labeling scheme for dynamic ordered XML trees", ICDE 2004
+- Garner, "The residue number system", IRE Trans. Electronic Computers EC-8(2), 1959
+- Goodrich & Mitzenmacher, "Invertible Bloom lookup tables", Allerton 2011, doi:10.1109/allerton.2011.6120248
+- Eppstein, Goodrich, Uyeda & Varghese, "What's the difference?", SIGCOMM 2011, doi:10.1145/2018436.2018462
+- Kohonen, "Correlation matrix memories", IEEE Trans. Computers C-21(4), 1972, doi:10.1109/TC.1972.5008975
+- Anderson, "A simple neural network generating an interactive memory", Mathematical Biosciences 14, 1972
+- Smolensky, "Tensor product variable binding…", Artificial Intelligence 46, 1990
+- Lamport, "Multiple byte processing with full-word instructions", CACM 18(8), 1975
+- Snaider & Franklin, "Modular composite representation", Cognitive Computation 6(3), 2014, doi:10.1007/s12559-013-9243-y
+- Fuchs, *Infinite Abelian Groups*, vol. I, Academic Press, 1970
