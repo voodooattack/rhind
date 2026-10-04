@@ -88,98 +88,98 @@
     {
      "m": 10,
      "op": "get",
-     "frac": 372,
-     "schema": 294,
-     "packed": 135,
-     "dict": 60
+     "frac": 381,
+     "schema": 307,
+     "packed": 134,
+     "dict": 59
     },
     {
      "m": 10,
      "op": "holding",
-     "frac": 3888,
+     "frac": 3911,
      "schema": "—",
-     "packed": 223,
-     "dict": 290
+     "packed": 220,
+     "dict": 299
     },
     {
      "m": 10,
      "op": "agreeing",
-     "frac": 2253,
+     "frac": 2260,
      "schema": "—",
-     "packed": 275,
-     "dict": 457
+     "packed": 280,
+     "dict": 460
     },
     {
      "m": 10,
      "op": "merge",
-     "frac": 1959,
-     "schema": 93,
-     "packed": 61,
-     "dict": 143
+     "frac": 1958,
+     "schema": 97,
+     "packed": 64,
+     "dict": 147
     },
     {
      "m": 100,
      "op": "get",
      "frac": 551,
-     "schema": 562,
+     "schema": 565,
      "packed": 145,
-     "dict": 57
+     "dict": 58
     },
     {
      "m": 100,
      "op": "holding",
-     "frac": 9511,
+     "frac": 9543,
      "schema": "—",
-     "packed": 298,
-     "dict": 1861
+     "packed": 276,
+     "dict": 1954
     },
     {
      "m": 100,
      "op": "agreeing",
-     "frac": 5476,
+     "frac": 5498,
      "schema": "—",
-     "packed": 355,
-     "dict": 3718
+     "packed": 322,
+     "dict": 3756
     },
     {
      "m": 100,
      "op": "merge",
-     "frac": 3367,
-     "schema": 126,
+     "frac": 3372,
+     "schema": 123,
      "packed": 64,
-     "dict": 677
+     "dict": 708
     },
     {
      "m": 1000,
      "op": "get",
-     "frac": 3279,
-     "schema": 3688,
-     "packed": 230,
+     "frac": 3266,
+     "schema": 3680,
+     "packed": 233,
      "dict": 65
     },
     {
      "m": 1000,
      "op": "holding",
-     "frac": 234007,
+     "frac": 235130,
      "schema": "—",
-     "packed": 1125,
-     "dict": 17038
+     "packed": 1108,
+     "dict": 18745
     },
     {
      "m": 1000,
      "op": "agreeing",
-     "frac": 204927,
+     "frac": 205315,
      "schema": "—",
-     "packed": 1201,
-     "dict": 38168
+     "packed": 1210,
+     "dict": 41491
     },
     {
      "m": 1000,
      "op": "merge",
-     "frac": 59358,
-     "schema": 894,
-     "packed": 121,
-     "dict": 7164
+     "frac": 59594,
+     "schema": 892,
+     "packed": 127,
+     "dict": 8467
     }
    ],
    "findings": [

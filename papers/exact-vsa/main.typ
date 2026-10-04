@@ -79,9 +79,10 @@
   #text(size: 12pt)[and its self-describing key set]
   #v(4pt)
   Abdullah Ali \
-  #text(size: 9pt)[Independent researcher · #link("mailto:voodooattack@gmail.com")[voodooattack\@gmail.com]]
+  #text(size: 9pt)[Independent researcher · #link("mailto:voodooattack@gmail.com")[voodooattack\@gmail.com]] \
+  #text(size: 9pt)[Code, proofs and data: #link("https://github.com/voodooattack/rhind")[github.com/voodooattack/rhind] · archived as #link("https://doi.org/10.5281/zenodo.23132905")[doi:10.5281/zenodo.23132905]]
   #v(2pt)
-  #text(size: 9pt, fill: gray)[Draft — October 2026]
+  #text(size: 9pt, fill: gray)[Preprint v0.1.1 — October 2026]
 ]
 
 #v(6pt)
@@ -780,8 +781,8 @@ which approximate VSA operations can be checked, or where key sets are open
 and layouts cannot be agreed — is the open question.
 
 *Reproducibility.* The library (`rhind`), the proof harness
-(`proofreport`), the proofs (001–006) and their data files are in the
-accompanying repository;
+(`proofreport`), the proofs (001–006) and their data files are at #link("https://github.com/voodooattack/rhind")[github.com/voodooattack/rhind],
+archived on Zenodo (all versions: #link("https://doi.org/10.5281/zenodo.23132905")[doi:10.5281/zenodo.23132905]);
 rerunning a proof regenerates its report and data, and recompiling this
 document regenerates every table.
 

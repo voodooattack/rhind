@@ -48,7 +48,7 @@
      "ex_us": 9,
      "m_recall": "3/10",
      "m_false": 300,
-     "m_us": 32,
+     "m_us": 31,
      "t_recall": "10/10",
      "t_false": 0
     },
@@ -62,7 +62,7 @@
      "ex_us": 9,
      "m_recall": "6/30",
      "m_false": 300,
-     "m_us": 74,
+     "m_us": 75,
      "t_recall": "30/30",
      "t_false": 0
     },
@@ -76,7 +76,7 @@
      "ex_us": 9,
      "m_recall": "11/100",
      "m_false": 300,
-     "m_us": 176,
+     "m_us": 175,
      "t_recall": "100/100",
      "t_false": 0
     },
@@ -90,7 +90,7 @@
      "ex_us": 10,
      "m_recall": "30/300",
      "m_false": 300,
-     "m_us": 417,
+     "m_us": 420,
      "t_recall": "299/300",
      "t_false": 267
     },
@@ -104,7 +104,7 @@
      "ex_us": 14,
      "m_recall": "21/300",
      "m_false": 300,
-     "m_us": 1297,
+     "m_us": 1330,
      "t_recall": "123/300",
      "t_false": 300
     },
@@ -118,7 +118,7 @@
      "ex_us": 26,
      "m_recall": "18/300",
      "m_false": 300,
-     "m_us": 4136,
+     "m_us": 4067,
      "t_recall": "—",
      "t_false": "—"
     }
@@ -202,7 +202,7 @@
      "t_recall": "300/300",
      "t_false": 11,
      "tm_recall": "299/300",
-     "f_us": 419
+     "f_us": 422
     },
     {
      "K": 1000,
@@ -213,7 +213,7 @@
      "t_recall": "259/300",
      "t_false": 300,
      "tm_recall": "123/300",
-     "f_us": 1272
+     "f_us": 1501
     },
     {
      "K": 3000,
@@ -224,7 +224,7 @@
      "t_recall": "91/300",
      "t_false": 300,
      "tm_recall": "—",
-     "f_us": 4066
+     "f_us": 4113
     }
    ],
    "findings": [

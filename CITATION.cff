@@ -7,8 +7,16 @@ authors:
     given-names: Abdullah
     email: voodooattack@gmail.com
 repository-code: "https://github.com/voodooattack/rhind"
+doi: 10.5281/zenodo.23132905
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23132905
+    description: "Concept DOI: all versions, resolves to the latest"
+  - type: doi
+    value: 10.5281/zenodo.23132906
+    description: "Version DOI of v0.1.0"
 license: Apache-2.0
-version: 0.1.0
+version: 0.1.1
 date-released: 2026-10-04
 keywords:
   - vector symbolic architectures
@@ -30,3 +38,5 @@ preferred-citation:
       given-names: Abdullah
   year: 2026
   status: preprint
+  doi: 10.5281/zenodo.23132905
+  url: "https://github.com/voodooattack/rhind"

@@ -1,5 +1,7 @@
 # rhind
 
+[![DOI](https://zenodo.org/badge/1402661301.svg)](https://doi.org/10.5281/zenodo.23132905)
+
 An exact superposed key–value memory in one rational, and its
 self-describing key set.
 
@@ -110,7 +112,9 @@ recovering the parts from the whole.
 
 ## Cite
 
-See `CITATION.cff`, or the "Cite this repository" box on GitHub.
+Archived on Zenodo: [doi:10.5281/zenodo.23132905](https://doi.org/10.5281/zenodo.23132905)
+(this DOI always resolves to the latest version). See also `CITATION.cff`,
+or the "Cite this repository" box on GitHub.
 
 ## Licence
 
